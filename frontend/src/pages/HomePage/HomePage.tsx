@@ -4,6 +4,7 @@ import CommunityAction from '../../components/home/CommunityAction/CommunityActi
 import EventsNearYou from '../../components/home/EventsNearYou/EventsNearYou'
 import CommunityImpact from '../../components/home/CommunityImpact/CommunityImpact'
 import BundeslandEvents from '../../components/home/BundeslandEvents/BundeslandEvents'
+import Footer from '../../components/layout/Footer/Footer'
 import heroImage from '../../assets/images/hero-city.png'
 import './HomePage.scss'
 
@@ -64,6 +65,7 @@ function HomePage() {
           <BundeslandEvents />
         </Container>
       </section>
+       <Footer />
     </div>
   )
 }
