@@ -1,0 +1,162 @@
+@use '../../../styles/variables' as *;
+
+.header {
+  position: relative;
+  z-index: 10;
+
+  padding-top: $spacing-3;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    min-height: 54px;
+    padding: 0 $spacing-4;
+
+    background-color: $color-surface;
+    border: 1px solid rgba(227, 235, 239, 0.8);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(38, 75, 91, 0.08);
+  }
+
+  &__logo {
+    flex-shrink: 0;
+
+    color: $color-primary;
+    font-size: 22px;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: stretch;
+    align-self: stretch;
+    gap: $spacing-5;
+
+    margin-left: 72px;
+  }
+
+  &__link {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    color: $color-text-secondary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $color-primary;
+    }
+
+    &--active {
+      color: $color-text;
+
+      &::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        height: 2px;
+
+        background-color: $color-primary;
+
+        content: '';
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    margin-left: auto;
+  }
+
+  &__create {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    padding: 10px 16px;
+
+    color: $color-surface;
+    background-color: $color-primary;
+    border-radius: 8px;
+
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: $color-primary-hover;
+    }
+
+    span {
+      font-size: 18px;
+      line-height: 1;
+    }
+  }
+
+  &__notification {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    color: $color-text-secondary;
+    text-decoration: none;
+
+    font-size: 18px;
+  }
+
+  &__notification-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+
+    width: 7px;
+    height: 7px;
+
+    background-color: $color-error;
+    border: 2px solid $color-surface;
+    border-radius: 50%;
+  }
+
+  &__profile {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    color: $color-text;
+    font-size: $font-size-sm;
+    text-decoration: none;
+  }
+
+  &__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    color: $color-surface;
+    background-color: $color-primary;
+    border-radius: 50%;
+
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+}
