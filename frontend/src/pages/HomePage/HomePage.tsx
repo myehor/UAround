@@ -3,6 +3,7 @@ import PopularEvents from '../../components/event/PopularEvents/PopularEvents'
 import CommunityAction from '../../components/home/CommunityAction/CommunityAction'
 import EventsNearYou from '../../components/home/EventsNearYou/EventsNearYou'
 import CommunityImpact from '../../components/home/CommunityImpact/CommunityImpact'
+import BundeslandEvents from '../../components/home/BundeslandEvents/BundeslandEvents'
 import heroImage from '../../assets/images/hero-city.png'
 import './HomePage.scss'
 
@@ -60,6 +61,7 @@ function HomePage() {
           <CommunityAction />
           <EventsNearYou />
           <CommunityImpact />
+          <BundeslandEvents />
         </Container>
       </section>
     </div>
