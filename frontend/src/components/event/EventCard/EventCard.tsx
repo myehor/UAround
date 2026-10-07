@@ -46,11 +46,19 @@ function EventCard({
 
         {isFeatured ? (
           <div className="event-card__footer">
-            <div className="event-card__going">
+            <div className="event-card__participants">
               <div className="event-card__avatars">
-                <span>Y</span>
-                <span>A</span>
-                <span>O</span>
+                <span className="event-card__avatar">
+                  Y
+                </span>
+
+                <span className="event-card__avatar">
+                  A
+                </span>
+
+                <span className="event-card__avatar">
+                  O
+                </span>
               </div>
 
               <span>
@@ -69,8 +77,7 @@ function EventCard({
           <p className="event-card__participants">
             {event.registeredCount}
             {event.participantLimit &&
-              ` / ${event.participantLimit}`}
-            {' '}
+              ` / ${event.participantLimit}`}{' '}
             participants
           </p>
         )}
