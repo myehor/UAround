@@ -1,5 +1,8 @@
 import Container from '../../components/layout/Container/Container'
 import PopularEvents from '../../components/event/PopularEvents/PopularEvents'
+import CommunityAction from '../../components/home/CommunityAction/CommunityAction'
+import EventsNearYou from '../../components/home/EventsNearYou/EventsNearYou'
+import CommunityImpact from '../../components/home/CommunityImpact/CommunityImpact'
 import heroImage from '../../assets/images/hero-city.png'
 import './HomePage.scss'
 
@@ -54,6 +57,9 @@ function HomePage() {
       <section className="home-page__events">
         <Container>
           <PopularEvents />
+          <CommunityAction />
+          <EventsNearYou />
+          <CommunityImpact />
         </Container>
       </section>
     </div>
