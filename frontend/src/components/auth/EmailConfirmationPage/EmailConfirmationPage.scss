@@ -1,0 +1,123 @@
+.email-confirmation-page {
+  width: 100%;
+  text-align: center;
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e8f4fb;
+    color: #2f8fc4;
+    font-size: 28px;
+  }
+
+  &__header {
+    h2 {
+      margin: 0;
+      color: #0d1745;
+      font-size: 30px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.6px;
+    }
+
+    p {
+      max-width: 400px;
+      margin: 12px auto 0;
+      color: #5d7199;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    strong {
+      color: #0d1745;
+      font-weight: 600;
+    }
+  }
+
+  &__button {
+    width: 100%;
+    max-width: 400px;
+    height: 44px;
+    margin-top: 28px;
+    border: 0;
+    border-radius: 7px;
+    background: #2f8fc4;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: #277fae;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+
+  &__resend {
+    margin-top: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    color: #7185a5;
+    font-size: 13px;
+
+    button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #0878bd;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+
+      &:hover {
+        color: #055e94;
+      }
+    }
+  }
+
+  &__back {
+    display: inline-block;
+    margin-top: 26px;
+    color: #607798;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #0878bd;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .email-confirmation-page {
+    &__header {
+      h2 {
+        font-size: 27px;
+      }
+    }
+
+    &__resend {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+}

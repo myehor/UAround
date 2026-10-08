@@ -6,7 +6,6 @@ function Header() {
 
   const isHomeActive = pathname === '/'
   const isEventsActive = pathname === '/events'
-  const isMyEventsActive = pathname === '/my-events'
 
   return (
     <header className="header">
@@ -48,42 +47,17 @@ function Header() {
             >
               Events
             </a>
-
-            <a
-              className={[
-                'header__link',
-                isMyEventsActive &&
-                  'header__link--active',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              href="/my-events"
-            >
-              My Events
-            </a>
           </nav>
 
           <div className="header__actions">
             <a
               className="header__create"
-              href="/create-event"
+              href="/events/create"
             >
               <span aria-hidden="true">
                 +
               </span>
               Create Event
-            </a>
-
-            <a
-              className="header__notification"
-              href="/notifications"
-              aria-label="Notifications"
-            >
-              <span aria-hidden="true">
-                ♟
-              </span>
-
-              <span className="header__notification-dot" />
             </a>
 
             <a

@@ -1,15 +1,52 @@
 import AppLayout from './components/layout/AppLayout/AppLayout'
-import HomePage from './pages/HomePage/HomePage'
-import EventsPage from './pages/EventsPage/EventsPage'
+import EmailConfirmationPage from './components/auth/EmailConfirmationPage/EmailConfirmationPage'
+import EmailConfirmedPage from './components/auth/EmailConfirmedPage/EmailConfirmedPage'
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage/ForgotPasswordPage'
+import LoginPage from './components/auth/LoginPage/LoginPage'
+import RegisterPage from './components/auth/RegisterPage/RegisterPage'
+import ResetPasswordPage from './components/auth/ResetPasswordPage/ResetPasswordPage'
+import CreateEventPage from './pages/CreateEventPage/CreateEventPage'
 import EventDetailsPage from './pages/EventDetailsPage/EventDetailsPage'
+import EventsPage from './pages/EventsPage/EventsPage'
+import HomePage from './pages/HomePage/HomePage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
 
 function App() {
   const pathname = window.location.pathname
 
-  const eventDetailsMatch =
-    pathname.match(/^\/events\/([^/]+)$/)
+  const eventDetailsMatch = pathname.match(
+    /^\/events\/([^/]+)$/,
+  )
 
   const renderPage = () => {
+    if (pathname === '/register') {
+      return <RegisterPage />
+    }
+
+    if (pathname === '/login') {
+      return <LoginPage />
+    }
+
+    if (pathname === '/email-confirmation') {
+      return <EmailConfirmationPage />
+    }
+
+    if (pathname === '/email-confirmed') {
+      return <EmailConfirmedPage />
+    }
+
+    if (pathname === '/forgot-password') {
+      return <ForgotPasswordPage />
+    }
+
+    if (pathname === '/reset-password') {
+      return <ResetPasswordPage />
+    }
+
+    if (pathname === '/events/create') {
+      return <CreateEventPage />
+    }
+
     if (eventDetailsMatch) {
       return (
         <EventDetailsPage
@@ -22,10 +59,30 @@ function App() {
       return <EventsPage />
     }
 
+    if (pathname === '/profile') {
+      return <ProfilePage />
+    }
+
     return <HomePage />
   }
 
-  return <AppLayout>{renderPage()}</AppLayout>
+  const isAuthPage =
+    pathname === '/register' ||
+    pathname === '/login' ||
+    pathname === '/email-confirmation' ||
+    pathname === '/email-confirmed' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password'
+
+  if (isAuthPage) {
+    return renderPage()
+  }
+
+  return (
+    <AppLayout>
+      {renderPage()}
+    </AppLayout>
+  )
 }
 
 export default App
