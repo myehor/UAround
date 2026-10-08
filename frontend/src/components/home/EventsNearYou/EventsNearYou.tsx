@@ -1,8 +1,41 @@
+import type {
+  KeyboardEvent,
+  MouseEvent,
+} from 'react'
+
 import { mockEvents } from '../../../data/mockEvents'
+
 import './EventsNearYou.scss'
 
 function EventsNearYou() {
   const nearbyEvents = mockEvents.slice(0, 3)
+
+  const handleCardClick = (
+    eventId: string,
+  ) => {
+    window.location.assign(
+      `/events/${eventId}`,
+    )
+  }
+
+  const handleCardKeyDown = (
+    keyboardEvent: KeyboardEvent<HTMLElement>,
+    eventId: string,
+  ) => {
+    if (
+      keyboardEvent.key === 'Enter' ||
+      keyboardEvent.key === ' '
+    ) {
+      keyboardEvent.preventDefault()
+      handleCardClick(eventId)
+    }
+  }
+
+  const handleRegisterClick = (
+    event: MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation()
+  }
 
   return (
     <section className="events-near-you">
@@ -24,6 +57,7 @@ function EventsNearYou() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+
               <circle
                 cx="12"
                 cy="9"
@@ -59,6 +93,17 @@ function EventsNearYou() {
           <article
             key={event.id}
             className="events-near-you__card"
+            onClick={() =>
+              handleCardClick(event.id)
+            }
+            onKeyDown={(keyboardEvent) =>
+              handleCardKeyDown(
+                keyboardEvent,
+                event.id,
+              )
+            }
+            role="link"
+            tabIndex={0}
           >
             <div className="events-near-you__image">
               <img
@@ -100,6 +145,9 @@ function EventsNearYou() {
                 <button
                   type="button"
                   className="events-near-you__register"
+                  onClick={
+                    handleRegisterClick
+                  }
                 >
                   Register
                 </button>

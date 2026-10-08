@@ -1,3 +1,5 @@
+import type { KeyboardEvent } from 'react'
+
 import type { Event } from '../../../types/event'
 
 import './EventCard.scss'
@@ -13,6 +15,22 @@ function EventCard({
 }: EventCardProps) {
   const isFeatured = variant === 'featured'
 
+  const handleCardClick = () => {
+    window.location.href = `/events/${event.id}`
+  }
+
+  const handleCardKeyDown = (
+    keyboardEvent: KeyboardEvent<HTMLElement>,
+  ) => {
+    if (
+      keyboardEvent.key === 'Enter' ||
+      keyboardEvent.key === ' '
+    ) {
+      keyboardEvent.preventDefault()
+      handleCardClick()
+    }
+  }
+
   return (
     <article
       className={[
@@ -21,9 +39,16 @@ function EventCard({
       ]
         .filter(Boolean)
         .join(' ')}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role="link"
+      tabIndex={0}
     >
       <div className="event-card__image">
-        <img src={event.imageUrl} alt="" />
+        <img
+          src={event.imageUrl}
+          alt=""
+        />
       </div>
 
       <div className="event-card__content">
@@ -69,6 +94,9 @@ function EventCard({
           <button
             type="button"
             className="event-card__register"
+            onClick={(event) => {
+              event.stopPropagation()
+            }}
           >
             Register
           </button>

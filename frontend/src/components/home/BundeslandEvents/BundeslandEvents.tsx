@@ -1,8 +1,42 @@
+import type {
+  KeyboardEvent,
+  MouseEvent,
+} from 'react'
+
 import { mockEvents } from '../../../data/mockEvents'
+
 import './BundeslandEvents.scss'
 
 function BundeslandEvents() {
-  const bundeslandEvents = mockEvents.slice(0, 3)
+  const bundeslandEvents =
+    mockEvents.slice(0, 3)
+
+  const handleCardClick = (
+    eventId: string,
+  ) => {
+    window.location.assign(
+      `/events/${eventId}`,
+    )
+  }
+
+  const handleCardKeyDown = (
+    keyboardEvent: KeyboardEvent<HTMLElement>,
+    eventId: string,
+  ) => {
+    if (
+      keyboardEvent.key === 'Enter' ||
+      keyboardEvent.key === ' '
+    ) {
+      keyboardEvent.preventDefault()
+      handleCardClick(eventId)
+    }
+  }
+
+  const handleRegisterClick = (
+    event: MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation()
+  }
 
   return (
     <section className="bundesland-events">
@@ -24,6 +58,7 @@ function BundeslandEvents() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
+
               <path
                 d="M9 3v15.5M15 5.5V21"
                 stroke="currentColor"
@@ -58,6 +93,17 @@ function BundeslandEvents() {
           <article
             key={event.id}
             className="bundesland-events__card"
+            onClick={() =>
+              handleCardClick(event.id)
+            }
+            onKeyDown={(keyboardEvent) =>
+              handleCardKeyDown(
+                keyboardEvent,
+                event.id,
+              )
+            }
+            role="link"
+            tabIndex={0}
           >
             <div className="bundesland-events__image">
               <img
@@ -99,6 +145,9 @@ function BundeslandEvents() {
                 <button
                   type="button"
                   className="bundesland-events__register"
+                  onClick={
+                    handleRegisterClick
+                  }
                 >
                   Register
                 </button>
