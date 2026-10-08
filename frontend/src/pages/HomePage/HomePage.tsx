@@ -4,8 +4,8 @@ import CommunityAction from '../../components/home/CommunityAction/CommunityActi
 import EventsNearYou from '../../components/home/EventsNearYou/EventsNearYou'
 import CommunityImpact from '../../components/home/CommunityImpact/CommunityImpact'
 import BundeslandEvents from '../../components/home/BundeslandEvents/BundeslandEvents'
-import Footer from '../../components/layout/Footer/Footer'
 import heroImage from '../../assets/images/hero-city.png'
+
 import './HomePage.scss'
 
 function HomePage() {
@@ -15,7 +15,9 @@ function HomePage() {
         <Container>
           <div
             className="home-page__hero-image"
-            style={{ backgroundImage: `url(${heroImage})` }}
+            style={{
+              backgroundImage: `url(${heroImage})`,
+            }}
           >
             <div className="home-page__hero-overlay" />
 
@@ -65,7 +67,6 @@ function HomePage() {
           <BundeslandEvents />
         </Container>
       </section>
-       <Footer />
     </div>
   )
 }

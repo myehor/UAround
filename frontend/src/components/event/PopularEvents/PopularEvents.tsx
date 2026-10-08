@@ -8,25 +8,43 @@ import { mockEvents } from '../../../data/mockEvents'
 import '@splidejs/splide/css'
 import './PopularEvents.scss'
 
+const MAX_POPULAR_EVENTS = 5
+
 function PopularEvents() {
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const sliderRef = useRef<HTMLDivElement | null>(null)
+  const sliderRef =
+    useRef<HTMLDivElement | null>(null)
+
   const splideRef = useRef<Splide | null>(null)
 
+  const popularEvents = [...mockEvents]
+    .sort(
+      (firstEvent, secondEvent) =>
+        secondEvent.registeredCount -
+        firstEvent.registeredCount,
+    )
+    .slice(0, MAX_POPULAR_EVENTS)
+
   useEffect(() => {
-    if (!sliderRef.current) {
+    if (
+      !sliderRef.current ||
+      popularEvents.length === 0
+    ) {
       return
     }
 
     const options: Options = {
-      type: 'loop',
+      type:
+        popularEvents.length > 1
+          ? 'loop'
+          : 'slide',
       perPage: 1,
       perMove: 1,
       gap: 0,
-      arrows: true,
-      pagination: true,
-      autoplay: true,
+      arrows: popularEvents.length > 1,
+      pagination: popularEvents.length > 1,
+      autoplay: popularEvents.length > 1,
       interval: 5000,
       pauseOnHover: true,
       pauseOnFocus: true,
@@ -50,10 +68,14 @@ function PopularEvents() {
       splide.destroy()
       splideRef.current = null
     }
-  }, [])
+  }, [popularEvents.length])
 
   const goToSlide = (index: number) => {
     splideRef.current?.go(index)
+  }
+
+  if (popularEvents.length === 0) {
+    return null
   }
 
   return (
@@ -85,7 +107,7 @@ function PopularEvents() {
       >
         <div className="splide__track">
           <ul className="splide__list">
-            {mockEvents.map((event) => (
+            {popularEvents.map((event) => (
               <li
                 key={event.id}
                 className="splide__slide"
@@ -102,44 +124,53 @@ function PopularEvents() {
         </div>
       </div>
 
-      <div className="popular-events__previews">
-        {mockEvents.map((event, index) => (
-          <button
-            key={event.id}
-            type="button"
-            className={[
-              'popular-events__preview',
-              index === activeIndex &&
-                'popular-events__preview--active',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            onClick={() => goToSlide(index)}
-            aria-label={`Show ${event.title}`}
-          >
-            <div className="popular-events__preview-image">
-              <img
-                src={event.imageUrl}
-                alt=""
-              />
-            </div>
+      {popularEvents.length > 1 && (
+        <div className="popular-events__previews">
+          {popularEvents.map((event, index) => (
+            <button
+              key={event.id}
+              type="button"
+              className={[
+                'popular-events__preview',
+                index === activeIndex &&
+                  'popular-events__preview--active',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() =>
+                goToSlide(index)
+              }
+              aria-label={`Show ${event.title}`}
+            >
+              <div className="popular-events__preview-image">
+                <img
+                  src={event.imageUrl}
+                  alt=""
+                  onError={(event) => {
+                    event.currentTarget.style.display =
+                      'none'
+                  }}
+                />
+              </div>
 
-            <div className="popular-events__preview-content">
-              <span className="popular-events__preview-category">
-                {event.category}
-              </span>
+              <div className="popular-events__preview-content">
+                <span className="popular-events__preview-category">
+                  {event.category}
+                </span>
 
-              <h3>{event.title}</h3>
+                <h3>{event.title}</h3>
 
-              <p>
-                {event.date} · {event.startTime}
-              </p>
+                <p>
+                  {event.date} ·{' '}
+                  {event.startTime}
+                </p>
 
-              <p>{event.city}</p>
-            </div>
-          </button>
-        ))}
-      </div>
+                <p>{event.city}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   )
 }

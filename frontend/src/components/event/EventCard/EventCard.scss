@@ -1,6 +1,7 @@
 @use '../../../styles/variables' as *;
 
 .event-card {
+  display: flex;
   width: 100%;
   overflow: hidden;
   background-color: $color-surface;
@@ -22,6 +23,8 @@
 }
 
 .event-card__content {
+  display: flex;
+  flex-direction: column;
   padding: $spacing-4;
 }
 
@@ -55,10 +58,72 @@
   margin: 0;
 }
 
+.event-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
 .event-card__participants {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   color: $color-text-secondary;
   font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+.event-card__avatars {
+  display: flex;
+  align-items: center;
+}
+
+.event-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: -7px;
+  color: $color-surface;
+  background-color: $color-primary;
+  border: 2px solid $color-surface;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:nth-child(2) {
+    background-color: #4f7fa3;
+  }
+
+  &:nth-child(3) {
+    background-color: #7c9bb2;
+  }
+}
+
+.event-card__register {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  color: $color-surface;
+  background-color: $color-primary;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #00275a;
+  }
 }
 
 /* Featured / active card */
@@ -70,68 +135,19 @@
   }
 
   .event-card__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
     margin-top: auto;
-    padding-top: 12px;
   }
+}
 
-  .event-card__participants {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    white-space: nowrap;
-  }
+/* Mobile */
 
-  .event-card__avatars {
-    display: flex;
-    align-items: center;
-  }
-
-  .event-card__avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    margin-left: -7px;
-    color: $color-surface;
-    background-color: $color-primary;
-    border: 2px solid $color-surface;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: $font-weight-semibold;
-
-    &:first-child {
-      margin-left: 0;
-    }
-
-    &:nth-child(2) {
-      background-color: #4f7fa3;
-    }
-
-    &:nth-child(3) {
-      background-color: #7c9bb2;
-    }
+@media (max-width: 640px) {
+  .event-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .event-card__register {
-    flex-shrink: 0;
-    padding: 8px 14px;
-    color: $color-surface;
-    background-color: $color-primary;
-    border: 0;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: $font-weight-semibold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: #00275a;
-    }
+    width: 100%;
   }
 }

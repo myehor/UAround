@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
+
 import Header from '../Header/Header'
+import Footer from '../Footer/Footer'
+
 import './AppLayout.scss'
 
 type AppLayoutProps = {
@@ -14,6 +17,8 @@ function AppLayout({ children }: AppLayoutProps) {
       <main className="app-layout__main">
         {children}
       </main>
+
+      <Footer />
     </div>
   )
 }

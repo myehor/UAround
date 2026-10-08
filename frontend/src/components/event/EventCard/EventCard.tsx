@@ -1,4 +1,5 @@
 import type { Event } from '../../../types/event'
+
 import './EventCard.scss'
 
 type EventCardProps = {
@@ -44,43 +45,34 @@ function EventCard({
           </p>
         </div>
 
-        {isFeatured ? (
-          <div className="event-card__footer">
-            <div className="event-card__participants">
-              <div className="event-card__avatars">
-                <span className="event-card__avatar">
-                  Y
-                </span>
+        <div className="event-card__footer">
+          <div className="event-card__participants">
+            <div className="event-card__avatars">
+              <span className="event-card__avatar">
+                Y
+              </span>
 
-                <span className="event-card__avatar">
-                  A
-                </span>
+              <span className="event-card__avatar">
+                A
+              </span>
 
-                <span className="event-card__avatar">
-                  O
-                </span>
-              </div>
-
-              <span>
-                {event.registeredCount} going
+              <span className="event-card__avatar">
+                O
               </span>
             </div>
 
-            <button
-              type="button"
-              className="event-card__register"
-            >
-              Register
-            </button>
+            <span>
+              {event.registeredCount} going
+            </span>
           </div>
-        ) : (
-          <p className="event-card__participants">
-            {event.registeredCount}
-            {event.participantLimit &&
-              ` / ${event.participantLimit}`}{' '}
-            participants
-          </p>
-        )}
+
+          <button
+            type="button"
+            className="event-card__register"
+          >
+            Register
+          </button>
+        </div>
       </div>
     </article>
   )
