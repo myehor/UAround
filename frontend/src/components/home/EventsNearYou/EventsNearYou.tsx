@@ -1,21 +1,45 @@
-import type {
-  KeyboardEvent,
-  MouseEvent,
+
+import {
+  useEffect,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
 } from 'react'
 
-import { mockEvents } from '../../../data/mockEvents'
+import { getEvents } from '../../../api/events'
+import type { Event } from '../../../types/event'
 
 import './EventsNearYou.scss'
 
 function EventsNearYou() {
-  const nearbyEvents = mockEvents.slice(0, 3)
+  const [events, setEvents] = useState<Event[]>([])
 
-  const handleCardClick = (
-    eventId: string,
-  ) => {
-    window.location.assign(
-      `/events/${eventId}`,
-    )
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch (error) {
+        console.error('Failed to load nearby events:', error)
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  const nearbyEvents = events.slice(0, 3)
+
+  const handleCardClick = (eventId: string) => {
+    window.location.assign(`/events/${eventId}`)
   }
 
   const handleCardKeyDown = (
@@ -93,14 +117,9 @@ function EventsNearYou() {
           <article
             key={event.id}
             className="events-near-you__card"
-            onClick={() =>
-              handleCardClick(event.id)
-            }
+            onClick={() => handleCardClick(event.id)}
             onKeyDown={(keyboardEvent) =>
-              handleCardKeyDown(
-                keyboardEvent,
-                event.id,
-              )
+              handleCardKeyDown(keyboardEvent, event.id)
             }
             role="link"
             tabIndex={0}
@@ -145,9 +164,7 @@ function EventsNearYou() {
                 <button
                   type="button"
                   className="events-near-you__register"
-                  onClick={
-                    handleRegisterClick
-                  }
+                  onClick={handleRegisterClick}
                 >
                   Register
                 </button>

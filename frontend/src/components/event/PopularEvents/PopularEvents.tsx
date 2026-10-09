@@ -1,9 +1,12 @@
+
 import { useEffect, useRef, useState } from 'react'
 import Splide from '@splidejs/splide'
 import type { Options } from '@splidejs/splide'
 
+import { getEvents } from '../../../api/events'
+import type { Event } from '../../../types/event'
+
 import EventCard from '../EventCard/EventCard'
-import { mockEvents } from '../../../data/mockEvents'
 
 import '@splidejs/splide/css'
 import './PopularEvents.scss'
@@ -11,14 +14,35 @@ import './PopularEvents.scss'
 const MAX_POPULAR_EVENTS = 5
 
 function PopularEvents() {
+  const [events, setEvents] = useState<Event[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const sliderRef =
-    useRef<HTMLDivElement | null>(null)
-
+  const sliderRef = useRef<HTMLDivElement | null>(null)
   const splideRef = useRef<Splide | null>(null)
 
-  const popularEvents = [...mockEvents]
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch (error) {
+        console.error('Failed to load popular events:', error)
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  const popularEvents = [...events]
     .sort(
       (firstEvent, secondEvent) =>
         secondEvent.registeredCount -
@@ -137,17 +161,15 @@ function PopularEvents() {
               ]
                 .filter(Boolean)
                 .join(' ')}
-              onClick={() =>
-                goToSlide(index)
-              }
+              onClick={() => goToSlide(index)}
               aria-label={`Show ${event.title}`}
             >
               <div className="popular-events__preview-image">
                 <img
                   src={event.imageUrl}
                   alt=""
-                  onError={(event) => {
-                    event.currentTarget.style.display =
+                  onError={(imageEvent) => {
+                    imageEvent.currentTarget.style.display =
                       'none'
                   }}
                 />
@@ -161,8 +183,7 @@ function PopularEvents() {
                 <h3>{event.title}</h3>
 
                 <p>
-                  {event.date} ·{' '}
-                  {event.startTime}
+                  {event.date} · {event.startTime}
                 </p>
 
                 <p>{event.city}</p>

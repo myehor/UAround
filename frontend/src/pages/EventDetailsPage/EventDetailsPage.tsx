@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { mockEvents } from '../../data/mockEvents'
+import { getEvents } from '../../api/events'
+import type { Event } from '../../types/event'
 
 import './EventDetailsPage.scss'
 
@@ -9,13 +10,68 @@ type EventDetailsPageProps = {
 }
 
 function EventDetailsPage({ eventId }: EventDetailsPageProps) {
+  const [events, setEvents] = useState<Event[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        setError(null)
+
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch {
+        if (isActive) {
+          setError('Failed to load event details. Please try again later.')
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
   const event = useMemo(
-    () => mockEvents.find((item) => item.id === eventId),
-    [eventId],
+    () => events.find((item) => item.id === eventId),
+    [events, eventId],
   )
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [shareMessage, setShareMessage] = useState('')
+
+  if (isLoading) {
+    return (
+      <main className="event-details-page">
+        <div className="event-details-page__not-found">
+          <p role="status">Loading event details...</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="event-details-page">
+        <div className="event-details-page__not-found">
+          <p role="alert">{error}</p>
+          <a href="/events">← Back to Events</a>
+        </div>
+      </main>
+    )
+  }
 
   if (!event) {
     return (
@@ -75,7 +131,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     0,
   )
 
-  const organizerEvents = mockEvents
+  const organizerEvents = events
     .filter(
       (item) =>
         item.id !== event.id &&
@@ -83,7 +139,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     )
     .slice(0, 3)
 
-  const similarEvents = mockEvents
+  const similarEvents = events
     .filter(
       (item) =>
         item.id !== event.id &&

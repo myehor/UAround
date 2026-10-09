@@ -1,9 +1,37 @@
-import { mockEvents } from '../../data/mockEvents'
+
+import { useEffect, useState } from 'react'
+
+import { getEvents } from '../../api/events'
+import type { Event } from '../../types/event'
 
 import './ProfilePage.scss'
 
 function ProfilePage() {
-  const attendingEvents = mockEvents.slice(0, 3)
+  const [events, setEvents] = useState<Event[]>([])
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch (error) {
+        console.error('Failed to load profile events:', error)
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  const attendingEvents = events.slice(0, 3)
 
   return (
     <main className="profile-page">

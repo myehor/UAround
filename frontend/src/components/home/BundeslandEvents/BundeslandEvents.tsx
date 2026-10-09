@@ -1,22 +1,47 @@
-import type {
-  KeyboardEvent,
-  MouseEvent,
+
+import {
+  useEffect,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
 } from 'react'
 
-import { mockEvents } from '../../../data/mockEvents'
+import { getEvents } from '../../../api/events'
+import type { Event } from '../../../types/event'
 
 import './BundeslandEvents.scss'
 
 function BundeslandEvents() {
-  const bundeslandEvents =
-    mockEvents.slice(0, 3)
+  const [events, setEvents] = useState<Event[]>([])
 
-  const handleCardClick = (
-    eventId: string,
-  ) => {
-    window.location.assign(
-      `/events/${eventId}`,
-    )
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch (error) {
+        console.error('Failed to load Bundesland events:', error)
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  const bundeslandEvents = events
+    .filter((event) => event.bundesland === 'Bayern')
+    .slice(0, 3)
+
+  const handleCardClick = (eventId: string) => {
+    window.location.assign(`/events/${eventId}`)
   }
 
   const handleCardKeyDown = (
@@ -93,14 +118,9 @@ function BundeslandEvents() {
           <article
             key={event.id}
             className="bundesland-events__card"
-            onClick={() =>
-              handleCardClick(event.id)
-            }
+            onClick={() => handleCardClick(event.id)}
             onKeyDown={(keyboardEvent) =>
-              handleCardKeyDown(
-                keyboardEvent,
-                event.id,
-              )
+              handleCardKeyDown(keyboardEvent, event.id)
             }
             role="link"
             tabIndex={0}
@@ -145,9 +165,7 @@ function BundeslandEvents() {
                 <button
                   type="button"
                   className="bundesland-events__register"
-                  onClick={
-                    handleRegisterClick
-                  }
+                  onClick={handleRegisterClick}
                 >
                   Register
                 </button>
