@@ -1,9 +1,9 @@
+
 @use '../../../styles/variables' as *;
 
 .header {
   position: relative;
   z-index: 10;
-
   padding-top: $spacing-3;
 
   &__inner {
@@ -11,7 +11,6 @@
     align-items: center;
     min-height: 54px;
     padding: 0 $spacing-4;
-
     background-color: $color-surface;
     border: 1px solid rgba(227, 235, 239, 0.8);
     border-radius: 16px;
@@ -20,7 +19,6 @@
 
   &__logo {
     flex-shrink: 0;
-
     color: $color-primary;
     font-size: 22px;
     font-weight: $font-weight-bold;
@@ -32,21 +30,17 @@
     align-items: stretch;
     align-self: stretch;
     gap: $spacing-5;
-
     margin-left: 72px;
   }
 
   &__link {
     position: relative;
-
     display: flex;
     align-items: center;
-
     color: $color-text-secondary;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
     text-decoration: none;
-
     transition: color 0.2s ease;
 
     &:hover {
@@ -61,11 +55,8 @@
         right: 0;
         bottom: 0;
         left: 0;
-
         height: 2px;
-
         background-color: $color-primary;
-
         content: '';
       }
     }
@@ -81,18 +72,16 @@
   &__create {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: $spacing-2;
-
     padding: 10px 16px;
-
     color: $color-surface;
     background-color: $color-primary;
     border-radius: 8px;
-
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
     text-decoration: none;
-
+    white-space: nowrap;
     transition: background-color 0.2s ease;
 
     &:hover {
@@ -105,40 +94,11 @@
     }
   }
 
-  &__notification {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 32px;
-    height: 32px;
-
-    color: $color-text-secondary;
-    text-decoration: none;
-
-    font-size: 18px;
-  }
-
-  &__notification-dot {
-    position: absolute;
-    top: 3px;
-    right: 3px;
-
-    width: 7px;
-    height: 7px;
-
-    background-color: $color-error;
-    border: 2px solid $color-surface;
-    border-radius: 50%;
-  }
-
   &__profile {
     display: flex;
     align-items: center;
     gap: $spacing-2;
-
+    flex-shrink: 0;
     color: $color-text;
     font-size: $font-size-sm;
     text-decoration: none;
@@ -148,15 +108,99 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     width: 32px;
     height: 32px;
-
+    flex-shrink: 0;
     color: $color-surface;
     background-color: $color-primary;
     border-radius: 50%;
-
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header {
+    &__nav {
+      margin-left: 32px;
+      gap: $spacing-4;
+    }
+
+    &__actions {
+      gap: $spacing-3;
+    }
+
+    &__inner {
+      padding-right: 12px;
+      padding-left: 12px;
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  .header {
+    &__inner {
+      min-height: auto;
+      padding: 14px 16px;
+      flex-wrap: wrap;
+      row-gap: 14px;
+    }
+
+    &__logo {
+      font-size: 21px;
+    }
+
+    &__nav {
+      order: 3;
+      width: 100%;
+      min-height: 38px;
+      margin-left: 0;
+      gap: 28px;
+      border-top: 1px solid rgba(227, 235, 239, 0.8);
+    }
+
+    &__link {
+      min-height: 38px;
+    }
+
+    &__actions {
+      gap: 12px;
+    }
+
+    &__create {
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    &__profile {
+      gap: 6px;
+    }
+
+    &__profile-name {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 380px) {
+  .header {
+    &__inner {
+      padding: 12px;
+    }
+
+    &__create {
+      gap: 5px;
+      padding: 9px;
+      font-size: 12px;
+    }
+
+    &__actions {
+      gap: 8px;
+    }
+
+    &__nav {
+      justify-content: space-between;
+      gap: 16px;
+    }
   }
 }

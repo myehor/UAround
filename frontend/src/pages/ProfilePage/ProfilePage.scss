@@ -740,11 +740,19 @@
     }
 
     &__event-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 210px;
+      grid-template-columns: none;
+      gap: 12px;
 
-    &__event-card:last-child {
-      display: none;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 6px;
+
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
     }
   }
 }
@@ -780,8 +788,19 @@
     }
 
     &__event-grid {
-      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 210px;
+      grid-template-columns: none;
+      gap: 12px;
+
+      min-width: 0;
       overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 6px;
+
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     &__past-events {
@@ -862,7 +881,19 @@
     }
 
     &__event-grid {
-      grid-template-columns: repeat(3, 210px);
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 210px;
+      grid-template-columns: none;
+      gap: 12px;
+
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 6px;
+
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     &__past-event {

@@ -1,3 +1,5 @@
+
+import { useState } from 'react'
 import type { EventCategory } from '../../../types/event'
 
 import './EventFilters.scss'
@@ -87,9 +89,7 @@ const citiesByBundesland: Record<string, string[]> = {
   Thüringen: ['Erfurt'],
 }
 
-const bundeslaender = Object.keys(
-  citiesByBundesland,
-)
+const bundeslaender = Object.keys(citiesByBundesland)
 
 function EventFilters({
   selectedCategory,
@@ -104,14 +104,21 @@ function EventFilters({
   onDateToChange,
   onReset,
 }: EventFiltersProps) {
-  const availableCities =
-    selectedBundesland
-      ? citiesByBundesland[selectedBundesland] ?? []
-      : []
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleBundeslandChange = (
-    value: string,
-  ) => {
+  const availableCities = selectedBundesland
+    ? citiesByBundesland[selectedBundesland] ?? []
+    : []
+
+  const activeFilterCount = [
+    selectedBundesland,
+    selectedCity,
+    selectedDateFrom,
+    selectedDateTo,
+    selectedCategory,
+  ].filter(Boolean).length
+
+  const handleBundeslandChange = (value: string) => {
     onBundeslandChange(value)
     onCityChange('')
   }
@@ -121,170 +128,158 @@ function EventFilters({
   }
 
   return (
-    <aside className="event-filters">
-      <div className="event-filters__header">
-        <h2>Filters</h2>
-
+    <aside
+      className={[
+        'event-filters',
+        isOpen && 'event-filters--open',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className="event-filters__mobile-header">
         <button
           type="button"
-          onClick={handleReset}
+          className="event-filters__toggle"
+          onClick={() => setIsOpen((current) => !current)}
+          aria-expanded={isOpen}
         >
-          Reset
+          <span className="event-filters__toggle-label">
+            <span aria-hidden="true">☷</span>
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="event-filters__count">
+                {activeFilterCount}
+              </span>
+            )}
+          </span>
+
+          <span
+            className="event-filters__chevron"
+            aria-hidden="true"
+          >
+            {isOpen ? '−' : '+'}
+          </span>
         </button>
       </div>
 
-      <div className="event-filters__section">
-        <h3>Location</h3>
+      <div className="event-filters__content">
+        <div className="event-filters__header">
+          <h2>Filters</h2>
 
-        <label>
-          <span>Bundesland</span>
-
-          <select
-            value={selectedBundesland}
-            onChange={(event) =>
-              handleBundeslandChange(
-                event.target.value,
-              )
-            }
+          <button
+            type="button"
+            onClick={handleReset}
           >
-            <option value="">
-              Select Bundesland
-            </option>
+            Reset
+          </button>
+        </div>
 
-            {bundeslaender.map(
-              (bundesland) => (
+        <div className="event-filters__section">
+          <h3>Location</h3>
+
+          <label>
+            <span>Bundesland</span>
+
+            <select
+              value={selectedBundesland}
+              onChange={(event) =>
+                handleBundeslandChange(event.target.value)
+              }
+            >
+              <option value="">Select Bundesland</option>
+
+              {bundeslaender.map((bundesland) => (
                 <option
                   key={bundesland}
                   value={bundesland}
                 >
                   {bundesland}
                 </option>
-              ),
-            )}
-          </select>
-        </label>
+              ))}
+            </select>
+          </label>
 
-        <label>
-          <span>City</span>
+          <label>
+            <span>City</span>
 
-          <select
-            value={selectedCity}
-            onChange={(event) =>
-              onCityChange(
-                event.target.value,
-              )
-            }
-            disabled={!selectedBundesland}
-          >
-            <option value="">
-              {selectedBundesland
-                ? 'Select city'
-                : 'Select Bundesland first'}
-            </option>
-
-            {availableCities.map((city) => (
-              <option
-                key={city}
-                value={city}
-              >
-                {city}
+            <select
+              value={selectedCity}
+              onChange={(event) =>
+                onCityChange(event.target.value)
+              }
+              disabled={!selectedBundesland}
+            >
+              <option value="">
+                {selectedBundesland
+                  ? 'Select city'
+                  : 'Select Bundesland first'}
               </option>
-            ))}
-          </select>
-        </label>
-      </div>
 
-      <div className="event-filters__section">
-        <h3>Date</h3>
+              {availableCities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
-        <label>
-          <span>From</span>
+        <div className="event-filters__section">
+          <h3>Date</h3>
 
-          <input
-            type="date"
-            value={selectedDateFrom}
-            onChange={(event) =>
-              onDateFromChange(
-                event.target.value,
-              )
-            }
-          />
-        </label>
+          <label>
+            <span>From</span>
 
-        <label>
-          <span>To</span>
+            <input
+              type="date"
+              value={selectedDateFrom}
+              onChange={(event) =>
+                onDateFromChange(event.target.value)
+              }
+            />
+          </label>
 
-          <input
-            type="date"
-            value={selectedDateTo}
-            onChange={(event) =>
-              onDateToChange(
-                event.target.value,
-              )
-            }
-          />
-        </label>
-      </div>
+          <label>
+            <span>To</span>
 
-      <div className="event-filters__section">
-        <h3>Category</h3>
+            <input
+              type="date"
+              value={selectedDateTo}
+              onChange={(event) =>
+                onDateToChange(event.target.value)
+              }
+            />
+          </label>
+        </div>
 
-        <label>
-          <span>Event category</span>
+        <div className="event-filters__section">
+          <h3>Category</h3>
 
-          <select
-            value={selectedCategory}
-            onChange={(event) =>
-              onCategoryChange(
-                event.target.value as EventCategory | '',
-              )
-            }
-          >
-            <option value="">
-              All categories
-            </option>
+          <label>
+            <span>Event category</span>
 
-            <option value="Sport">
-              Sport
-            </option>
-
-            <option value="Party">
-              Party
-            </option>
-
-            <option value="Social">
-              Social
-            </option>
-
-            <option value="Music">
-              Music
-            </option>
-
-            <option value="IT & Networking">
-              IT & Networking
-            </option>
-
-            <option value="Education">
-              Education
-            </option>
-
-            <option value="Family">
-              Family
-            </option>
-
-            <option value="Culture">
-              Culture
-            </option>
-
-            <option value="Volunteering">
-              Volunteering
-            </option>
-
-            <option value="Other">
-              Other
-            </option>
-          </select>
-        </label>
+            <select
+              value={selectedCategory}
+              onChange={(event) =>
+                onCategoryChange(
+                  event.target.value as EventCategory | '',
+                )
+              }
+            >
+              <option value="">All categories</option>
+              <option value="Sport">Sport</option>
+              <option value="Party">Party</option>
+              <option value="Social">Social</option>
+              <option value="Music">Music</option>
+              <option value="IT & Networking">IT & Networking</option>
+              <option value="Education">Education</option>
+              <option value="Family">Family</option>
+              <option value="Culture">Culture</option>
+              <option value="Volunteering">Volunteering</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+        </div>
       </div>
     </aside>
   )

@@ -1,3 +1,4 @@
+
 @use '../../styles/variables' as *;
 
 .home-page {
@@ -7,13 +8,10 @@
 
   &__hero-image {
     position: relative;
-
     min-height: 340px;
     overflow: hidden;
-
     background-position: center;
     background-size: cover;
-
     border-radius: 16px;
   }
 
@@ -32,14 +30,12 @@
   &__hero-content {
     position: relative;
     z-index: 1;
-
     max-width: 620px;
     padding: 42px 36px;
   }
 
   &__eyebrow {
     margin-bottom: $spacing-3;
-
     color: $color-primary;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
@@ -47,7 +43,6 @@
 
   h1 {
     margin-bottom: $spacing-4;
-
     color: #17314f;
     font-size: 42px;
     line-height: 1.08;
@@ -55,7 +50,6 @@
 
   &__description {
     margin-bottom: $spacing-5;
-
     color: $color-text-secondary;
     font-size: $font-size-lg;
     line-height: 1.45;
@@ -65,18 +59,14 @@
     display: flex;
     align-items: center;
     gap: $spacing-2;
-
     padding: 12px 16px;
-
     color: $color-text;
     background-color: $color-surface;
     border: 0;
     border-radius: 10px;
     box-shadow: 0 4px 16px rgba(38, 75, 91, 0.12);
-
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
-
     cursor: pointer;
   }
 
@@ -87,5 +77,69 @@
 
   &__events {
     padding: $spacing-7 0;
+  }
+}
+
+/* Tablet: narrower, centered content */
+@media (min-width: 576px) and (max-width: 1099px) {
+  .home-page {
+    .container {
+      max-width: 940px;
+    }
+
+    &__hero {
+      padding-top: 12px;
+    }
+
+    &__hero-image {
+      min-height: 310px;
+    }
+
+    &__hero-content {
+      max-width: 560px;
+      padding: 34px 30px;
+    }
+
+    h1 {
+      font-size: clamp(32px, 4vw, 38px);
+    }
+
+    &__description {
+      font-size: 16px;
+    }
+
+    &__events {
+      padding: 36px 0;
+    }
+  }
+}
+
+/* Small tablets and phones */
+@media (max-width: 575px) {
+  .home-page {
+    &__hero {
+      padding-top: 8px;
+    }
+
+    &__hero-image {
+      min-height: 300px;
+    }
+
+    &__hero-content {
+      max-width: 100%;
+      padding: 24px 22px;
+    }
+
+    h1 {
+      font-size: 29px;
+    }
+
+    &__description {
+      font-size: 14px;
+    }
+
+    &__events {
+      padding: 28px 0;
+    }
   }
 }
