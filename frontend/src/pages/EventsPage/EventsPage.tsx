@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Container from '../../components/layout/Container/Container'
 import EventCard from '../../components/event/EventCard/EventCard'
@@ -8,7 +8,8 @@ import EventResultsToolbar, {
   type EventSortOption,
 } from '../../components/event/EventResultsToolbar/EventResultsToolbar'
 import EventSearch from '../../components/event/EventSearch/EventSearch'
-import { mockEvents } from '../../data/mockEvents'
+import { getEvents } from '../../api/events'
+import type { Event } from '../../types/event'
 import type { EventCategory } from '../../types/event'
 import heroImage from '../../assets/images/hero-city.png'
 
@@ -17,6 +18,43 @@ import './EventsPage.scss'
 const EVENTS_PER_PAGE = 12
 
 function EventsPage() {
+  const [events, setEvents] = useState<Event[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let isActive = true
+
+    const loadEvents = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        const data = await getEvents()
+
+        if (isActive) {
+          setEvents(data)
+        }
+      } catch {
+        if (isActive) {
+          setError(
+            'Failed to load events. Please try again later.',
+          )
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
   const [searchQuery, setSearchQuery] =
     useState('')
 
@@ -67,7 +105,7 @@ function EventsPage() {
     })
   }
 
-  const filteredEvents = mockEvents.filter(
+  const filteredEvents = events.filter(
     (event) => {
       const query =
         searchQuery.toLowerCase()
@@ -279,16 +317,20 @@ function EventsPage() {
                 }}
               />
 
-              <div className="events-page__grid">
-                {paginatedEvents.map(
-                  (event) => (
+              {isLoading ? (
+                <p role="status">Loading events...</p>
+              ) : error ? (
+                <p role="alert">{error}</p>
+              ) : (
+                <div className="events-page__grid">
+                  {paginatedEvents.map((event) => (
                     <EventCard
                       key={event.id}
                       event={event}
                     />
-                  ),
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
 
               {totalPages > 1 && (
                 <EventPagination
