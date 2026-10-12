@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EventCategory {
+  Sport
+  Party
+  Social
+  Music
+  IT_NETWORKING @map("IT & Networking")
+  Education
+  Family
+  Culture
+  Volunteering
+  Other
+}
+
+enum EventStatus {
+  open
+  almostFull  @map("almost-full")
+  fullyBooked @map("fully-booked")
+  closed
+  cancelled
+}
+
+model Event {
+  id          String        @id
+  title       String
+  description String        @db.Text
+  category    EventCategory
+  imageUrl    String
+
+  date      String
+  startTime String
+  endTime   String?
+
+  bundesland String
+  city       String
+  venue      String
+  address    String?
+
+  participantLimit Int?
+  registeredCount  Int  @default(0)
+
+  status EventStatus
+
+  creatorId String
+  createdAt String
+  updatedAt String
+
+  @@index([category])
+  @@index([bundesland, city])
+  @@index([date])
+  @@map("events")
+}
