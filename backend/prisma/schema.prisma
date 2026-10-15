@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -28,6 +29,40 @@ enum EventStatus {
   cancelled
 }
 
+enum AuthTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model User {
+  id            String   @id @default(cuid())
+  firstName     String
+  lastName      String
+  email         String   @unique
+  passwordHash  String
+  emailVerified Boolean  @default(false)
+
+  bundesland String
+  city       String
+
+  bio              String?  @db.Text
+  phone            String?
+  avatarUrl         String?
+  coverUrl          String?
+  languages         String[] @default([])
+  profileCompleted Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdEvents Event[]             @relation("EventOwner")
+  registrations EventRegistration[]
+  authTokens    AuthToken[]
+
+  @@index([bundesland, city])
+  @@map("users")
+}
+
 model Event {
   id          String        @id
   title       String
@@ -45,16 +80,65 @@ model Event {
   address    String?
 
   participantLimit Int?
-  registeredCount  Int  @default(0)
+  registeredCount  Int @default(0)
 
   status EventStatus
 
+  // Legacy field retained for existing events.
   creatorId String
+
+  // Optional owner for backward compatibility with existing records.
+  ownerUserId String?
+  createdBy   User?   @relation("EventOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
   createdAt String
   updatedAt String
+
+  registrations EventRegistration[]
 
   @@index([category])
   @@index([bundesland, city])
   @@index([date])
+  @@index([ownerUserId])
   @@map("events")
+}
+
+model EventRegistration {
+  id           String   @id @default(cuid())
+  userId       String
+  eventId      String
+  registeredAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@index([userId, registeredAt])
+  @@map("event_registrations")
+}
+
+model AuthToken {
+  id        String        @id @default(cuid())
+  tokenHash String        @unique
+  type      AuthTokenType
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([expiresAt])
+  @@map("auth_tokens")
+}
+
+model UserSession {
+  sid    String   @id @db.VarChar
+  sess   Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
+  @@map("user_sessions")
 }

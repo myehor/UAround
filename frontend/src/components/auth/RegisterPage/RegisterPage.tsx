@@ -1,9 +1,51 @@
-import { useState } from 'react'
+
+import { useState, type FormEvent } from 'react'
 import AuthLayout from '../../../components/auth/AuthLayout/AuthLayout'
+import { registerUser } from '../../../api/auth'
 import './RegisterPage.scss'
 
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setError('')
+    setIsSubmitting(true)
+
+    const formData = new FormData(event.currentTarget)
+
+    const password = String(formData.get('password') ?? '')
+    const email = String(formData.get('email') ?? '').trim()
+
+    if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+      setError('Password must contain at least one letter and one number.')
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      await registerUser({
+        firstName: String(formData.get('firstName') ?? '').trim(),
+        lastName: String(formData.get('lastName') ?? '').trim(),
+        email,
+        password,
+        bundesland: String(formData.get('bundesland') ?? ''),
+        city: String(formData.get('city') ?? ''),
+      })
+
+      window.location.assign('/')
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Registration failed. Please try again.',
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <AuthLayout
@@ -13,52 +55,48 @@ function RegisterPage() {
       <div className="register-page">
         <div className="register-page__header">
           <h2>Create an account</h2>
-
           <p>
             Join UAround and start exploring events
             in your city.
           </p>
         </div>
 
-        <form className="register-page__form">
+        <form className="register-page__form" onSubmit={handleSubmit}>
           <div className="register-page__row">
             <label className="register-page__field">
-              <span>
-                First name <strong>*</strong>
-              </span>
-
+              <span>First name <strong>*</strong></span>
               <input
                 type="text"
                 name="firstName"
                 placeholder="First name"
                 autoComplete="given-name"
+                maxLength={80}
+                required
               />
             </label>
 
             <label className="register-page__field">
-              <span>
-                Last name <strong>*</strong>
-              </span>
-
+              <span>Last name <strong>*</strong></span>
               <input
                 type="text"
                 name="lastName"
                 placeholder="Last name"
                 autoComplete="family-name"
+                maxLength={80}
+                required
               />
             </label>
           </div>
 
           <label className="register-page__field">
-            <span>
-              Email <strong>*</strong>
-            </span>
-
+            <span>Email <strong>*</strong></span>
             <input
               type="email"
               name="email"
               placeholder="your@email.com"
               autoComplete="email"
+              maxLength={254}
+              required
             />
           </label>
 
@@ -74,19 +112,16 @@ function RegisterPage() {
                 name="password"
                 placeholder="Password"
                 autoComplete="new-password"
+                minLength={8}
+                maxLength={72}
+                required
               />
 
               <button
                 type="button"
                 className="register-page__password-toggle"
-                onClick={() =>
-                  setShowPassword((current) => !current)
-                }
-                aria-label={
-                  showPassword
-                    ? 'Hide password'
-                    : 'Show password'
-                }
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? '◉' : '◌'}
               </button>
@@ -98,128 +133,67 @@ function RegisterPage() {
           </div>
 
           <div className="register-page__location">
-            <div className="register-page__section-title">
-              Location
-            </div>
+            <div className="register-page__section-title">Location</div>
 
             <div className="register-page__row">
               <label className="register-page__field">
-                <span>
-                  Bundesland <strong>*</strong>
-                </span>
-
-                <select
-                  name="bundesland"
-                  defaultValue="Bayern"
-                >
-                  <option value="Bayern">
-                    Bayern
-                  </option>
-                  <option value="Baden-Württemberg">
-                    Baden-Württemberg
-                  </option>
-                  <option value="Berlin">
-                    Berlin
-                  </option>
-                  <option value="Brandenburg">
-                    Brandenburg
-                  </option>
-                  <option value="Bremen">
-                    Bremen
-                  </option>
-                  <option value="Hamburg">
-                    Hamburg
-                  </option>
-                  <option value="Hessen">
-                    Hessen
-                  </option>
-                  <option value="Mecklenburg-Vorpommern">
-                    Mecklenburg-Vorpommern
-                  </option>
-                  <option value="Niedersachsen">
-                    Niedersachsen
-                  </option>
-                  <option value="Nordrhein-Westfalen">
-                    Nordrhein-Westfalen
-                  </option>
-                  <option value="Rheinland-Pfalz">
-                    Rheinland-Pfalz
-                  </option>
-                  <option value="Saarland">
-                    Saarland
-                  </option>
-                  <option value="Sachsen">
-                    Sachsen
-                  </option>
-                  <option value="Sachsen-Anhalt">
-                    Sachsen-Anhalt
-                  </option>
-                  <option value="Schleswig-Holstein">
-                    Schleswig-Holstein
-                  </option>
-                  <option value="Thüringen">
-                    Thüringen
-                  </option>
+                <span>Bundesland <strong>*</strong></span>
+                <select name="bundesland" defaultValue="Bayern" required>
+                  <option value="Bayern">Bayern</option>
+                  <option value="Baden-Württemberg">Baden-Württemberg</option>
+                  <option value="Berlin">Berlin</option>
+                  <option value="Brandenburg">Brandenburg</option>
+                  <option value="Bremen">Bremen</option>
+                  <option value="Hamburg">Hamburg</option>
+                  <option value="Hessen">Hessen</option>
+                  <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                  <option value="Niedersachsen">Niedersachsen</option>
+                  <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
+                  <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
+                  <option value="Saarland">Saarland</option>
+                  <option value="Sachsen">Sachsen</option>
+                  <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
+                  <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                  <option value="Thüringen">Thüringen</option>
                 </select>
               </label>
 
               <label className="register-page__field">
-                <span>
-                  City <strong>*</strong>
-                </span>
-
-                <select
-                  name="city"
-                  defaultValue="Würzburg"
-                >
-                  <option value="Würzburg">
-                    Würzburg
-                  </option>
-                  <option value="Kitzingen">
-                    Kitzingen
-                  </option>
-                  <option value="München">
-                    München
-                  </option>
-                  <option value="Nürnberg">
-                    Nürnberg
-                  </option>
-                  <option value="Augsburg">
-                    Augsburg
-                  </option>
-                  <option value="Berlin">
-                    Berlin
-                  </option>
-                  <option value="Hamburg">
-                    Hamburg
-                  </option>
-                  <option value="Frankfurt">
-                    Frankfurt
-                  </option>
-                  <option value="Köln">
-                    Köln
-                  </option>
-                  <option value="Düsseldorf">
-                    Düsseldorf
-                  </option>
+                <span>City <strong>*</strong></span>
+                <select name="city" defaultValue="Würzburg" required>
+                  <option value="Würzburg">Würzburg</option>
+                  <option value="Kitzingen">Kitzingen</option>
+                  <option value="München">München</option>
+                  <option value="Nürnberg">Nürnberg</option>
+                  <option value="Augsburg">Augsburg</option>
+                  <option value="Berlin">Berlin</option>
+                  <option value="Hamburg">Hamburg</option>
+                  <option value="Frankfurt">Frankfurt</option>
+                  <option value="Köln">Köln</option>
+                  <option value="Düsseldorf">Düsseldorf</option>
                 </select>
               </label>
             </div>
           </div>
 
+          {error && (
+            <p role="alert" className="register-page__error">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
             className="register-page__submit"
+            disabled={isSubmitting}
           >
-            Create Account
+            {isSubmitting ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
         <p className="register-page__login">
           Already have an account?{' '}
-          <a href="/login">
-            Log in
-          </a>
+          <a href="/login">Log in</a>
         </p>
       </div>
     </AuthLayout>

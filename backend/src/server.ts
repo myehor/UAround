@@ -1,10 +1,62 @@
+
+import 'dotenv/config';
 import express from 'express';
+import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
+import { Pool } from 'pg';
+
 import eventsRouter from './events.js';
+import authRouter from './auth.js';
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT ?? 3000);
 
-app.use(express.json());
+const databaseUrl = process.env.DATABASE_URL;
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is not configured');
+}
+
+if (!sessionSecret || sessionSecret.length < 32) {
+  throw new Error('SESSION_SECRET must contain at least 32 characters');
+}
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const pool = new Pool({
+  connectionString: databaseUrl,
+});
+
+const PgSession = connectPgSimple(session);
+
+app.disable('x-powered-by');
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
+
+app.use(express.json({ limit: '20kb' }));
+
+app.use(
+  session({
+    name: 'uaround.sid',
+    store: new PgSession({
+      pool,
+      createTableIfMissing: true,
+      tableName: 'user_sessions',
+    }),
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+  }),
+);
 
 app.get('/api/health', (_req, res) => {
   res.json({
@@ -14,7 +66,19 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/events', eventsRouter);
+app.use('/api/auth', authRouter);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`UAround API is running at http://localhost:${PORT}`);
 });
+
+function shutdown() {
+  server.close(() => {
+    void pool.end().finally(() => {
+      process.exit(0);
+    });
+  });
+}
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
