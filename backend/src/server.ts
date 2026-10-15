@@ -7,6 +7,7 @@ import { Pool } from 'pg';
 
 import eventsRouter from './events.js';
 import authRouter from './auth.js';
+import profileRouter from './profile.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -67,6 +68,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/events', eventsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/profile', profileRouter);
 
 const server = app.listen(PORT, () => {
   console.log(`UAround API is running at http://localhost:${PORT}`);

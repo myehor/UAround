@@ -5,7 +5,7 @@ import './Header.scss';
 
 function Header() {
   const pathname = window.location.pathname;
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
 
   const isHomeActive = pathname === '/';
   const isEventsActive = pathname === '/events';
@@ -15,15 +15,6 @@ function Header() {
     : 'Guest';
 
   const avatarLetter = user?.firstName?.charAt(0).toUpperCase() || 'G';
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      window.location.assign('/');
-    } catch (error) {
-      console.error('Failed to log out:', error);
-    }
-  };
 
   return (
     <header className="header">
@@ -77,12 +68,7 @@ function Header() {
                   <span className="header__profile-name">
                     {displayName}
                   </span>
-                  <span aria-hidden="true">⌄</span>
                 </a>
-
-                <button type="button" onClick={handleLogout}>
-                  Log out
-                </button>
               </div>
             ) : (
               <div className="header__profile">

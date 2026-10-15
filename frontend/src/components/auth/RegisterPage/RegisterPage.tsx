@@ -1,13 +1,16 @@
-
 import { useState, type FormEvent } from 'react'
 import AuthLayout from '../../../components/auth/AuthLayout/AuthLayout'
 import { registerUser } from '../../../api/auth'
+import { bundeslaender, getCities } from '../../../data/locations'
 import './RegisterPage.scss'
 
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedBundesland, setSelectedBundesland] = useState('Bayern')
+
+  const availableCities = getCities(selectedBundesland)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -138,39 +141,36 @@ function RegisterPage() {
             <div className="register-page__row">
               <label className="register-page__field">
                 <span>Bundesland <strong>*</strong></span>
-                <select name="bundesland" defaultValue="Bayern" required>
-                  <option value="Bayern">Bayern</option>
-                  <option value="Baden-Württemberg">Baden-Württemberg</option>
-                  <option value="Berlin">Berlin</option>
-                  <option value="Brandenburg">Brandenburg</option>
-                  <option value="Bremen">Bremen</option>
-                  <option value="Hamburg">Hamburg</option>
-                  <option value="Hessen">Hessen</option>
-                  <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
-                  <option value="Niedersachsen">Niedersachsen</option>
-                  <option value="Nordrhein-Westfalen">Nordrhein-Westfalen</option>
-                  <option value="Rheinland-Pfalz">Rheinland-Pfalz</option>
-                  <option value="Saarland">Saarland</option>
-                  <option value="Sachsen">Sachsen</option>
-                  <option value="Sachsen-Anhalt">Sachsen-Anhalt</option>
-                  <option value="Schleswig-Holstein">Schleswig-Holstein</option>
-                  <option value="Thüringen">Thüringen</option>
+                <select
+                  name="bundesland"
+                  value={selectedBundesland}
+                  onChange={(event) => {
+                    setSelectedBundesland(event.target.value)
+                  }}
+                  required
+                >
+                  {bundeslaender.map((bundesland) => (
+                    <option key={bundesland} value={bundesland}>
+                      {bundesland}
+                    </option>
+                  ))}
                 </select>
               </label>
 
               <label className="register-page__field">
                 <span>City <strong>*</strong></span>
-                <select name="city" defaultValue="Würzburg" required>
-                  <option value="Würzburg">Würzburg</option>
-                  <option value="Kitzingen">Kitzingen</option>
-                  <option value="München">München</option>
-                  <option value="Nürnberg">Nürnberg</option>
-                  <option value="Augsburg">Augsburg</option>
-                  <option value="Berlin">Berlin</option>
-                  <option value="Hamburg">Hamburg</option>
-                  <option value="Frankfurt">Frankfurt</option>
-                  <option value="Köln">Köln</option>
-                  <option value="Düsseldorf">Düsseldorf</option>
+                <select
+                  key={selectedBundesland}
+                  name="city"
+                  defaultValue={availableCities[0] ?? ''}
+                  required
+                  disabled={availableCities.length === 0}
+                >
+                  {availableCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>
