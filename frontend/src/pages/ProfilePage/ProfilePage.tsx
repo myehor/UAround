@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 
 import { getProfile, updateProfile, type UserProfile } from '../../api/profile'
-import { getEvents } from '../../api/events'
+import { getMyEvents } from '../../api/events'
 import { useAuth } from '../../context/useAuth'
 import { bundeslaender, getCities } from '../../data/locations'
 import type { Event } from '../../types/event'
@@ -160,15 +160,20 @@ function ProfilePage() {
       }
 
       try {
-        const eventData = await getEvents()
+        const eventData = await getMyEvents()
 
         if (isActive) {
           setEvents(eventData)
         }
       } catch (eventError) {
-        console.error('Failed to load profile events:', eventError)
+        if (isActive) {
+          setError(
+            eventError instanceof Error
+              ? eventError.message
+              : 'Failed to load your events.',
+          )
+        }
       }
-
       if (isActive) {
         setIsLoading(false)
       }

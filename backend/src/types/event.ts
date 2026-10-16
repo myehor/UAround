@@ -39,6 +39,12 @@ export type Event = {
   status: EventStatus;
 
   creatorId: string;
+  createdBy?: {
+    id: string
+    firstName: string
+    lastName: string
+    avatarUrl: string | null
+  } | null
   createdAt: string;
   updatedAt: string;
 };

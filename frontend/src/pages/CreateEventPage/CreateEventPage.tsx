@@ -1,21 +1,43 @@
+
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 
+import { createEvent } from '../../api/events'
+import type { EventCategory } from '../../types/event'
+
 import './CreateEventPage.scss'
 
-const eventCategories = [
-  'Sports',
+const eventCategories: EventCategory[] = [
+  'Sport',
   'Culture',
   'Music',
   'Education',
-  'Networking',
-  'Food & Drinks',
-  'Travel',
-  'Business',
+  'IT & Networking',
+  'Social',
+  'Party',
+  'Family',
+  'Volunteering',
+  'Other',
 ]
 
+const categoryIcons: Record<EventCategory, string> = {
+  Sport: '⚽',
+  Culture: '🎭',
+  Music: '♫',
+  Education: '🎓',
+  'IT & Networking': '👥',
+  Social: '🤝',
+  Party: '🎉',
+  Family: '👨‍👩‍👧',
+  Volunteering: '💚',
+  Other: '✦',
+}
+
+
 function CreateEventPage() {
-  const [selectedCategory, setSelectedCategory] = useState('Sports')
+  const [selectedCategory, setSelectedCategory] = useState<EventCategory>('Sport')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [eventImage, setEventImage] = useState(
     'https://picsum.photos/seed/uaround-football/800/450',
   )
@@ -31,8 +53,63 @@ function CreateEventPage() {
     setEventImage(imageUrl)
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setSubmitError('')
+
+    const formData = new FormData(event.currentTarget)
+
+    const title = String(formData.get('title') ?? '').trim()
+    const description = String(formData.get('description') ?? '').trim()
+    const date = String(formData.get('date') ?? '')
+    const startTime = String(formData.get('startTime') ?? '')
+    const endTime = String(formData.get('endTime') ?? '')
+    const city = String(formData.get('city') ?? '').trim()
+    const venue = String(formData.get('venue') ?? '').trim()
+
+    if (!title || !description || !date || !startTime || !city || !venue) {
+      setSubmitError('Please fill in all required fields.')
+      return
+    }
+
+    if (description.length < 10) {
+      setSubmitError('Description must contain at least 10 characters.')
+      return
+    }
+
+    if (endTime && endTime <= startTime) {
+      setSubmitError('End time must be later than start time.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const createdEvent = await createEvent({
+        title,
+        description,
+        category: selectedCategory as EventCategory,
+        imageUrl: eventImage.startsWith('http')
+          ? eventImage
+          : 'https://picsum.photos/seed/uaround-event/800/450',
+        date,
+        startTime,
+        ...(endTime ? { endTime } : {}),
+        bundesland: 'Bayern',
+        city,
+        venue,
+      })
+
+      window.location.assign(`/events/${createdEvent.id}`)
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to create event. Please try again.',
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -244,14 +321,7 @@ function CreateEventPage() {
                   onClick={() => setSelectedCategory(category)}
                 >
                   <span>
-                    {category === 'Sports' && '⚽'}
-                    {category === 'Culture' && '🎭'}
-                    {category === 'Music' && '♫'}
-                    {category === 'Education' && '🎓'}
-                    {category === 'Networking' && '👥'}
-                    {category === 'Food & Drinks' && '🍴'}
-                    {category === 'Travel' && '✈'}
-                    {category === 'Business' && '💼'}
+                    {categoryIcons[category]}
                   </span>
 
                   {category}
@@ -316,6 +386,12 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
               </span>
             </label>
 
+            {submitError && (
+              <p role="alert" className="create-event-page__error">
+                {submitError}
+              </p>
+            )}
+
             <div className="create-event-page__actions">
               <a href="/events" className="create-event-page__cancel">
                 Cancel
@@ -324,9 +400,10 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
               <button
                 type="submit"
                 className="create-event-page__submit"
+                disabled={isSubmitting}
               >
                 <span aria-hidden="true">✣</span>
-                Create Event
+                {isSubmitting ? 'Creating event...' : 'Create Event'}
               </button>
             </div>
           </section>

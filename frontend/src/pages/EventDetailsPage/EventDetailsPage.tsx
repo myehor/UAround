@@ -97,18 +97,19 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     `https://picsum.photos/seed/uaround-${event.id}-5/800/450`,
   ]
 
-  const spotsLeft =
-    event.participantLimit !== undefined
-      ? Math.max(event.participantLimit - event.registeredCount, 0)
-      : undefined
+  const hasParticipantLimit =
+    event.participantLimit != null && event.participantLimit > 0
 
-  const capacityPercentage =
-    event.participantLimit !== undefined
-      ? Math.min(
-          (event.registeredCount / event.participantLimit) * 100,
-          100,
-        )
-      : 0
+  const spotsLeft = hasParticipantLimit
+    ? Math.max(event.participantLimit! - event.registeredCount, 0)
+    : undefined
+
+  const capacityPercentage = hasParticipantLimit
+    ? Math.min(
+        (event.registeredCount / event.participantLimit!) * 100,
+        100,
+      )
+    : 0
 
   const participantNames = [
     'Yehor',
@@ -135,7 +136,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     .filter(
       (item) =>
         item.id !== event.id &&
-        (item.city === event.city || item.bundesland === event.bundesland),
+        item.creatorId === event.creatorId,
     )
     .slice(0, 3)
 
@@ -143,8 +144,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     .filter(
       (item) =>
         item.id !== event.id &&
-        (item.category === event.category ||
-          item.bundesland === event.bundesland),
+        item.category === event.category,
     )
     .slice(0, 3)
 
@@ -507,7 +507,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                 Register for this event
               </button>
 
-              {event.participantLimit !== undefined && (
+              {hasParticipantLimit && (
                 <div className="event-details-page__capacity">
                   <strong>
                     {event.registeredCount} of {event.participantLimit} spots
@@ -583,16 +583,33 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
             <div className="event-details-page__organizer-card">
               <h2>Organizer</h2>
 
-              <div className="event-details-page__organizer-profile">
-                <div className="event-details-page__organizer-avatar">
-                  AK
-                </div>
 
-                <div>
-                  <strong>Andrii Kovalchuk</strong>
-                  <span>Community member</span>
-                </div>
+            <div className="event-details-page__organizer-profile">
+              <div className="event-details-page__organizer-avatar">
+                {event.createdBy?.avatarUrl ? (
+                  <img
+                    src={event.createdBy.avatarUrl}
+                    alt={`${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()}
+                  />
+                ) : (
+                  <span>
+                    {event.createdBy
+                      ? `${event.createdBy.firstName.charAt(0)}${event.createdBy.lastName.charAt(0)}`.toUpperCase()
+                      : '?'}
+                  </span>
+                )}
               </div>
+
+              <div>
+                <strong>
+                  {event.createdBy
+                    ? `${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()
+                    : 'Unknown organizer'}
+                </strong>
+                <span>Community member</span>
+              </div>
+            </div>
+
 
               <button
                 type="button"
@@ -601,7 +618,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                 View profile
               </button>
 
-              {organizerEvents.length > 0 && (
+              {organizerEvents.length > 0 ? (
                 <div className="event-details-page__organizer-events">
                   <div className="event-details-page__organizer-events-heading">
                     <h3>Other events by this organizer</h3>
@@ -629,6 +646,16 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                       </div>
                     </a>
                   ))}
+                </div>
+              ) : (
+                <div className="event-details-page__organizer-events">
+                  <div className="event-details-page__organizer-events-heading">
+                    <h3>Other events by this organizer</h3>
+                  </div>
+
+                  <p className="event-details-page__empty-events">
+                    This organizer hasn't created any other events yet.
+                  </p>
                 </div>
               )}
             </div>
@@ -668,14 +695,14 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           </div>
         </section>
 
-        {similarEvents.length > 0 && (
-          <section className="event-details-page__similar">
-            <div className="event-details-page__similar-heading">
-              <h2>Similar events</h2>
+        <section className="event-details-page__similar">
+          <div className="event-details-page__similar-heading">
+            <h2>Similar events</h2>
 
-              <a href="/events">View all →</a>
-            </div>
+            <a href="/events">View all →</a>
+          </div>
 
+          {similarEvents.length > 0 ? (
             <div className="event-details-page__similar-grid">
               {similarEvents.map((similarEvent) => (
                 <article
@@ -697,10 +724,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                   }}
                 >
                   <div className="event-details-page__similar-image">
-                    <img
-                      src={similarEvent.imageUrl}
-                      alt=""
-                    />
+                    <img src={similarEvent.imageUrl} alt="" />
                   </div>
 
                   <div className="event-details-page__similar-content">
@@ -715,9 +739,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                         📅 {similarEvent.date} · {similarEvent.startTime}
                       </span>
 
-                      <span>
-                        📍 {similarEvent.city}
-                      </span>
+                      <span>📍 {similarEvent.city}</span>
                     </div>
 
                     <div className="event-details-page__similar-footer">
@@ -728,9 +750,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                           <span>O</span>
                         </div>
 
-                        <small>
-                          {similarEvent.registeredCount} going
-                        </small>
+                        <small>{similarEvent.registeredCount} going</small>
                       </div>
 
                       <button
@@ -746,8 +766,12 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                 </article>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <p className="event-details-page__empty-events">
+              No similar events found.
+            </p>
+          )}
+        </section>
       </div>
     </main>
   )
