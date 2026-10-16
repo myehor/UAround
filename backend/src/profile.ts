@@ -3,6 +3,11 @@ import { z } from 'zod';
 
 import { prisma } from './lib/prisma.js';
 
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 const router = Router();
 
 const profileSelect = {
@@ -54,6 +59,76 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Failed to load profile:', error);
     res.status(500).json({ message: 'Failed to load profile.' });
+  }
+});
+
+router.post('/avatar', async (req, res) => {
+  try {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const schema = z.object({
+      imageData: z.string().min(1),
+    });
+
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      res.status(400).json({ message: 'Invalid image data' });
+      return;
+    }
+
+    const match = parsed.data.imageData.match(
+      /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/,
+    );
+
+    if (!match) {
+      res.status(400).json({ message: 'Unsupported image format' });
+      return;
+    }
+
+    const extension = match[1] === 'jpeg' ? 'jpg' : match[1];
+    const imageBuffer = Buffer.from(match[2], 'base64');
+
+    if (
+      imageBuffer.length === 0 ||
+      imageBuffer.length > 5 * 1024 * 1024
+    ) {
+      res.status(400).json({ message: 'Image must be no larger than 5 MB' });
+      return;
+    }
+
+    const uploadsDir = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '..',
+      'uploads',
+      'avatars',
+    );
+
+    await mkdir(uploadsDir, { recursive: true });
+
+    const filename = `${randomUUID()}.${extension}`;
+    const filePath = path.join(uploadsDir, filename);
+
+    await writeFile(filePath, imageBuffer);
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl: `/uploads/avatars/${filename}` },
+      select: profileSelect,
+    });
+
+    res.json({
+      message: 'Avatar uploaded successfully',
+      user,
+    });
+  } catch (error) {
+    console.error('Avatar upload failed:', error);
+    res.status(500).json({ message: 'Failed to upload avatar' });
   }
 });
 

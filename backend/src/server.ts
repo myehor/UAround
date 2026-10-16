@@ -1,6 +1,8 @@
 
 import 'dotenv/config';
 import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import { Pool } from 'pg';
@@ -11,6 +13,13 @@ import profileRouter from './profile.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
+const uploadsDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  'uploads',
+);
+
+app.use('/uploads', express.static(uploadsDir));
 
 const databaseUrl = process.env.DATABASE_URL;
 const sessionSecret = process.env.SESSION_SECRET;
@@ -37,7 +46,7 @@ if (isProduction) {
   app.set('trust proxy', 1);
 }
 
-app.use(express.json({ limit: '20kb' }));
+app.use(express.json({ limit: '7mb' }));
 
 app.use(
   session({

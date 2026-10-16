@@ -120,6 +120,332 @@ router.get('/my', async (req, res) => {
   }
 });
 
+// GET /api/events/:eventId/registration
+router.get('/:eventId/registration', async (req, res) => {
+  const userId = req.session.userId
+  const { eventId } = req.params
+
+  if (!userId) {
+    res.status(401).json({
+      message: 'Please sign in to check your registration.',
+    })
+    return
+  }
+
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { id: true },
+    })
+
+    if (!event) {
+      res.status(404).json({ message: 'Event not found.' })
+      return
+    }
+
+    const registration = await prisma.eventRegistration.findUnique({
+      where: {
+        userId_eventId: { userId, eventId },
+      },
+      select: { id: true },
+    })
+
+    res.status(200).json({
+      isRegistered: Boolean(registration),
+    })
+  } catch (error) {
+    console.error('Failed to check event registration:', error)
+
+    res.status(500).json({
+      message: 'Failed to check registration status.',
+    })
+  }
+})
+
+// GET /api/events/:eventId/participants — участники мероприятия
+router.get('/:eventId/participants', async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      select: { id: true },
+    });
+
+    if (!event) {
+      res.status(404).json({
+        message: 'Event not found.',
+      });
+      return;
+    }
+
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { eventId },
+      select: {
+        registeredAt: true,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarUrl: true,
+          },
+        },
+      },
+      orderBy: { registeredAt: 'asc' },
+    });
+
+    const participants = registrations.map(({ user }) => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarUrl: user.avatarUrl,
+    }));
+
+    res.json({
+      message: 'Event participants loaded successfully.',
+      total: participants.length,
+      participants,
+    });
+  } catch (error) {
+    console.error('Failed to fetch event participants:', error);
+
+    res.status(500).json({
+      message: 'Failed to fetch event participants.',
+    });
+  }
+});
+
+// POST /api/events/:eventId/register — регистрация на мероприятие
+router.post('/:eventId/register', async (req, res) => {
+  const userId = req.session.userId;
+  const { eventId } = req.params;
+
+  if (!userId) {
+    res.status(401).json({
+      message: 'Please sign in to register for an event.',
+    });
+    return;
+  }
+
+  try {
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const event = await tx.event.findUnique({
+          where: { id: eventId },
+          include: {
+            registrations: {
+              where: { userId },
+              select: { id: true },
+            },
+          },
+        });
+
+        if (!event) {
+          return { status: 404, message: 'Event not found.' };
+        }
+
+        if (event.ownerUserId === userId || event.creatorId === userId) {
+          return {
+            status: 400,
+            message: 'You cannot register for your own event.',
+          };
+        }
+
+        if (event.status !== 'open' && event.status !== 'almostFull') {
+          return {
+            status: 400,
+            message: 'This event is not open for registration.',
+          };
+        }
+
+        if (event.registrations.length > 0) {
+          return {
+            status: 409,
+            message: 'You are already registered for this event.',
+          };
+        }
+
+        const registeredCount = await tx.eventRegistration.count({
+          where: { eventId },
+        });
+
+        if (
+          event.participantLimit !== null &&
+          registeredCount >= event.participantLimit
+        ) {
+          return {
+            status: 400,
+            message: 'This event is fully booked.',
+          };
+        }
+
+        await tx.eventRegistration.create({
+          data: { userId, eventId },
+        });
+
+        const nextCount = registeredCount + 1;
+        const nextStatus =
+          event.participantLimit !== null &&
+          nextCount >= event.participantLimit
+            ? 'fullyBooked'
+            : event.participantLimit !== null &&
+                nextCount >= event.participantLimit * 0.8
+              ? 'almostFull'
+              : 'open';
+
+        await tx.event.update({
+          where: { id: eventId },
+          data: {
+            registeredCount: nextCount,
+            status: nextStatus,
+            updatedAt: new Date().toISOString(),
+          },
+        });
+
+        return {
+          status: 201,
+          message: 'Successfully registered for the event.',
+          registeredCount: nextCount,
+          registrationStatus: nextStatus,
+        };
+      },
+      { isolationLevel: 'Serializable' },
+    );
+
+    res.status(result.status).json(result);
+  } catch (error) {
+    console.error('Failed to register for event:', error);
+
+    res.status(500).json({
+      message: 'Failed to register for this event. Please try again.',
+    });
+  }
+});
+
+// DELETE /api/events/:eventId/register — отмена регистрации
+router.delete('/:eventId/register', async (req, res) => {
+  const userId = req.session.userId;
+  const { eventId } = req.params;
+
+  if (!userId) {
+    res.status(401).json({
+      message: 'Please sign in to cancel your registration.',
+    });
+    return;
+  }
+
+  try {
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const event = await tx.event.findUnique({
+          where: { id: eventId },
+        });
+
+        if (!event) {
+          return { status: 404, message: 'Event not found.' };
+        }
+
+        const registration = await tx.eventRegistration.findUnique({
+          where: {
+            userId_eventId: { userId, eventId },
+          },
+        });
+
+        if (!registration) {
+          return {
+            status: 404,
+            message: 'You are not registered for this event.',
+          };
+        }
+
+        await tx.eventRegistration.delete({
+          where: { id: registration.id },
+        });
+
+        const nextCount = Math.max(
+          await tx.eventRegistration.count({ where: { eventId } }),
+          0,
+        );
+
+        const nextStatus =
+          event.status === 'closed' || event.status === 'cancelled'
+            ? event.status
+            : event.participantLimit !== null &&
+                nextCount >= event.participantLimit
+              ? 'fullyBooked'
+              : event.participantLimit !== null &&
+                  nextCount >= event.participantLimit * 0.8
+                ? 'almostFull'
+                : 'open';
+
+        await tx.event.update({
+          where: { id: eventId },
+          data: {
+            registeredCount: nextCount,
+            status: nextStatus,
+            updatedAt: new Date().toISOString(),
+          },
+        });
+
+        return {
+          status: 200,
+          message: 'Registration cancelled successfully.',
+          registeredCount: nextCount,
+          registrationStatus: nextStatus,
+        };
+      },
+      { isolationLevel: 'Serializable' },
+    );
+
+    res.status(result.status).json(result);
+  } catch (error) {
+    console.error('Failed to cancel event registration:', error);
+
+    res.status(500).json({
+      message: 'Failed to cancel registration. Please try again.',
+    });
+  }
+});
+
+
+ // GET /api/events/my/attending — мероприятия, на которые записан текущий пользователь
+router.get('/my/attending', async (req, res) => {
+  const userId = req.session.userId;
+
+  if (!userId) {
+    res.status(401).json({
+      message: 'Please sign in to view your attending events.',
+    });
+    return;
+  }
+
+  try {
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { userId },
+      include: {
+        event: true,
+      },
+      orderBy: { registeredAt: 'desc' },
+    });
+
+    const events = registrations.map(({ event }) => formatEvent(event));
+
+    res.json({
+      message: 'Your attending events loaded successfully.',
+      total: events.length,
+      events,
+    });
+  } catch (error) {
+    console.error('Failed to fetch attending events:', error);
+
+    res.status(500).json({
+      message: 'Failed to fetch your attending events.',
+    });
+  }
+});
+
+
 // POST /api/events — создание мероприятия от имени текущего пользователя
 router.post('/', async (req, res) => {
   const userId = req.session.userId;

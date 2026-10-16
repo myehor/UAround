@@ -85,3 +85,37 @@ export async function updateProfile(
 
   return data.user
 }
+
+export async function uploadAvatar(file: File) {
+  const imageData = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to read image'));
+      }
+    };
+
+    reader.onerror = () => reject(new Error('Failed to read image'));
+    reader.readAsDataURL(file);
+  });
+
+  const response = await fetch('/api/profile/avatar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ imageData }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message ?? 'Failed to upload avatar');
+  }
+
+  return data.user;
+}

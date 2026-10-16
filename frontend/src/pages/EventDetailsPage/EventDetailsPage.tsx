@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { getEvents } from '../../api/events'
+import {
+  getEvents,
+  registerForEvent,
+  cancelEventRegistration,
+  getEventRegistrationStatus,
+  getEventParticipants,
+  type EventParticipant,
+} from '../../api/events'
 import type { Event } from '../../types/event'
+import { useAuth } from '../../context/useAuth'
 
 import './EventDetailsPage.scss'
 
@@ -13,6 +21,11 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
   const [events, setEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [participants, setParticipants] = useState<EventParticipant[]>([])
+  const { user } = useAuth()
+  const [isRegistered, setIsRegistered] = useState(false)
+  const [isRegistrationLoading, setIsRegistrationLoading] = useState(false)
+  const [registrationError, setRegistrationError] = useState<string | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -44,10 +57,67 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     }
   }, [])
 
+    useEffect(() => {
+    let isActive = true
+
+    const loadRegistrationStatus = async () => {
+      setIsRegistered(false)
+      setRegistrationError(null)
+
+      if (!user || !eventId) {
+        return
+      }
+
+      try {
+        const result = await getEventRegistrationStatus(eventId)
+
+        if (isActive) {
+          setIsRegistered(result.isRegistered)
+        }
+      } catch (error) {
+        if (isActive) {
+          setRegistrationError(
+            error instanceof Error
+              ? error.message
+              : 'Failed to load registration status.',
+          )
+        }
+      }
+    }
+
+    void loadRegistrationStatus()
+
+    return () => {
+      isActive = false
+    }
+  }, [eventId, user])
+
   const event = useMemo(
     () => events.find((item) => item.id === eventId),
     [events, eventId],
   )
+  
+  useEffect(() => {
+    let isActive = true
+
+    const loadParticipants = async () => {
+      try {
+        const data = await getEventParticipants(eventId)
+
+        if (isActive) {
+          setParticipants(data)
+        }
+      } catch (error) {
+        console.error('Failed to load event participants:', error)
+      }
+    }
+
+    void loadParticipants()
+
+    return () => {
+      isActive = false
+    }
+  }, [eventId])
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [shareMessage, setShareMessage] = useState('')
@@ -89,6 +159,47 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     )
   }
 
+
+  const isOrganizer =
+    user?.id === event.creatorId || user?.id === event.createdBy?.id
+
+  
+  const handleRegistration = async () => {
+    if (isOrganizer || isRegistrationLoading) {
+      return
+    }
+
+    setIsRegistrationLoading(true)
+    setRegistrationError(null)
+
+    try {
+      if (isRegistered) {
+        await cancelEventRegistration(event.id)
+        setIsRegistered(false)
+      } else {
+        await registerForEvent(event.id)
+        setIsRegistered(true)
+      }
+
+      try {
+        const updatedEvents = await getEvents()
+        setEvents(updatedEvents)
+      } catch {
+        setRegistrationError(
+          'Registration was updated, but the participant count could not be refreshed. Please reload the page.',
+        )
+      }
+    } catch (error) {
+      setRegistrationError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to update registration.',
+      )
+    } finally {
+      setIsRegistrationLoading(false)
+    }
+  }
+
   const galleryImages = [
     event.imageUrl,
     `https://picsum.photos/seed/uaround-${event.id}-2/800/450`,
@@ -97,38 +208,10 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     `https://picsum.photos/seed/uaround-${event.id}-5/800/450`,
   ]
 
-  const hasParticipantLimit =
-    event.participantLimit != null && event.participantLimit > 0
-
-  const spotsLeft = hasParticipantLimit
-    ? Math.max(event.participantLimit! - event.registeredCount, 0)
-    : undefined
-
-  const capacityPercentage = hasParticipantLimit
-    ? Math.min(
-        (event.registeredCount / event.participantLimit!) * 100,
-        100,
-      )
-    : 0
-
-  const participantNames = [
-    'Yehor',
-    'Anna',
-    'Oleksii',
-    'Maria',
-    'Dmytro',
-    'Olena',
-    'Andrii',
-    'Kateryna',
-  ]
-
-  const visibleParticipants = participantNames.slice(
-    0,
-    Math.min(participantNames.length, event.registeredCount),
-  )
+  const visibleParticipants = participants.slice(0, 8)
 
   const extraParticipants = Math.max(
-    event.registeredCount - visibleParticipants.length,
+    participants.length - visibleParticipants.length,
     0,
   )
 
@@ -499,85 +582,53 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
 
           <aside className="event-details-page__sidebar">
             <div className="event-details-page__registration">
-              <button
-                type="button"
-                className="event-details-page__register"
-              >
-                <span aria-hidden="true">👥</span>
-                Register for this event
-              </button>
-
-              {hasParticipantLimit && (
-                <div className="event-details-page__capacity">
-                  <strong>
-                    {event.registeredCount} of {event.participantLimit} spots
-                    filled
-                  </strong>
-
-                  <div className="event-details-page__capacity-bar">
-                    <div
-                      className="event-details-page__capacity-progress"
-                      style={{
-                        width: `${capacityPercentage}%`,
-                      }}
-                    />
-                  </div>
-
-                  {spotsLeft !== undefined && (
-                    <p>
-                      {spotsLeft > 0 ? `${spotsLeft} spots left` : 'Fully booked'}
-                    </p>
+              {isOrganizer ? (
+                <div className="event-details-page__register">
+                  You’re the organizer of this event.
+                </div>
+              ) : (
+                <>
+                  {!isRegistered && (
+                    <button
+                      type="button"
+                      className="event-details-page__register"
+                      onClick={handleRegistration}
+                      disabled={isRegistrationLoading}
+                    >
+                      {isRegistrationLoading ? 'Please wait...' : 'Register for this event'}
+                    </button>
                   )}
-                </div>
+
+                  {isRegistered && (
+                    <div className="event-details-page__registration-success">
+                      <h3>You’re on the list!</h3>
+                      <p className="event-details-page__registration-subtitle">
+                        Your registration is confirmed.
+                      </p>
+                      <p className="event-details-page__registration-thanks" role="status">
+                        Thanks for joining us! We look forward to seeing you at the event.
+                      </p>
+                      <p className="event-details-page__registration-hint">
+                        Plans changed? You can cancel your registration below so someone
+                        else can take your spot.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="event-details-page__cancel-registration"
+                        onClick={handleRegistration}
+                        disabled={isRegistrationLoading}
+                      >
+                        {isRegistrationLoading ? 'Cancelling...' : 'Cancel registration'}
+                      </button>
+                    </div>
+                  )}
+
+                  {registrationError && (
+                    <p role="alert">{registrationError}</p>
+                  )}
+                </>
               )}
-
-              <div className="event-details-page__mini-participants">
-                <div className="event-details-page__mini-avatars">
-                  {visibleParticipants.slice(0, 5).map((name) => (
-                    <span key={name}>{name.charAt(0)}</span>
-                  ))}
-                </div>
-
-                {event.registeredCount > 5 && (
-                  <strong>+{event.registeredCount - 5}</strong>
-                )}
-              </div>
-
-              <div className="event-details-page__benefits">
-                <div>
-                  <span>👥</span>
-
-                  <p>
-                    <strong>Meet new people</strong>
-
-                    <small>
-                      Connect with fellow Ukrainians in your area
-                    </small>
-                  </p>
-                </div>
-
-                <div>
-                  <span>🙌</span>
-
-                  <p>
-                    <strong>Enjoy the event</strong>
-
-                    <small>
-                      Spend time together in a friendly atmosphere
-                    </small>
-                  </p>
-                </div>
-
-                <div>
-                  <span>🤝</span>
-
-                  <p>
-                    <strong>Build community</strong>
-
-                    <small>Be part of the Ukrainian community</small>
-                  </p>
-                </div>
-              </div>
             </div>
 
             <div className="event-details-page__organizer-card">
@@ -677,15 +728,24 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           </div>
 
           <div className="event-details-page__participants-row">
-            {visibleParticipants.map((name, index) => (
-              <div
-                key={`${name}-${index}`}
-                className="event-details-page__participant-avatar"
-                title={name}
-              >
-                {name.charAt(0)}
-              </div>
-            ))}
+            {visibleParticipants.map((participant) => {
+              const fullName =
+                `${participant.firstName} ${participant.lastName}`.trim()
+
+              return (
+                <div
+                  key={participant.id}
+                  className="event-details-page__participant-avatar"
+                  title={fullName}
+                >
+                  {participant.avatarUrl ? (
+                    <img src={participant.avatarUrl} alt={fullName} />
+                  ) : (
+                    `${participant.firstName.charAt(0)}${participant.lastName.charAt(0)}`.toUpperCase()
+                  )}
+                </div>
+              )
+            })}
 
             {extraParticipants > 0 && (
               <div className="event-details-page__participants-more">

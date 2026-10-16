@@ -1,8 +1,11 @@
 
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 
-import { getProfile, updateProfile, type UserProfile } from '../../api/profile'
-import { getMyEvents } from '../../api/events'
+import { getProfile, updateProfile, uploadAvatar, type UserProfile } from '../../api/profile'
+import {
+  getMyEvents,
+  getAttendingEvents,
+} from '../../api/events'
 import { useAuth } from '../../context/useAuth'
 import { bundeslaender, getCities } from '../../data/locations'
 import type { Event } from '../../types/event'
@@ -101,6 +104,10 @@ function ProfilePage() {
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [events, setEvents] = useState<Event[]>([])
+  const [attendingEvents, setAttendingEvents] = useState<Event[]>([])
+  const [activeEventsTab, setActiveEventsTab] = useState<
+    'attending' | 'organizing'
+  >('attending')
   const [form, setForm] = useState<ProfileForm>(emptyForm)
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>('+49')
   const [isLanguagesOpen, setIsLanguagesOpen] = useState(false)
@@ -174,6 +181,22 @@ function ProfilePage() {
           )
         }
       }
+
+      try {
+        const attendingEventData = await getAttendingEvents()
+
+        if (isActive) {
+          setAttendingEvents(attendingEventData)
+        }
+      } catch (attendingError) {
+        if (isActive) {
+          setError(
+            attendingError instanceof Error
+              ? attendingError.message
+              : 'Failed to load attending events.',
+          )
+        }
+      }
       if (isActive) {
         setIsLoading(false)
       }
@@ -209,46 +232,60 @@ function ProfilePage() {
     if (profile) {
       setForm(toForm(profile))
       setPhoneCountry(getPhoneCountry(profile.phone ?? ''))
+      setAvatarPreview(profile.avatarUrl ?? null)
     }
 
     setIsEditing(false)
     setError('')
   }
 
-  const handleAvatarChange = (event: ChangeEvent<HTMLInputElement>) => {
+  
+  const handleAvatarChange = async (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0]
 
-    if (!file) {
-      return
-    }
+    if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please select an image file.')
-      event.target.value = ''
+    event.target.value = ''
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError('Please select a JPG, PNG, or WebP image.')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
       setError('The image must be smaller than 5 MB.')
-      event.target.value = ''
       return
     }
 
+    const previousAvatar = profile?.avatarUrl ?? null
     const previewUrl = URL.createObjectURL(file)
 
-    setAvatarPreview((previousPreview) => {
-      if (previousPreview?.startsWith('blob:')) {
-        URL.revokeObjectURL(previousPreview)
-      }
-
-      return previewUrl
-    })
-
+    setAvatarPreview(previewUrl)
     setError('')
-    setSuccess('Preview updated. Save the image permanently in a later step.')
-    event.target.value = ''
-  }
+    setSuccess('')
 
+    try {
+      const savedProfile = await uploadAvatar(file)
+
+      setProfile(savedProfile)
+      setAvatarPreview(savedProfile.avatarUrl ?? null)
+
+      await refreshUser()
+
+      setSuccess('Profile photo updated successfully.')
+    } catch (uploadError) {
+      setAvatarPreview(previousAvatar)
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'Failed to upload profile photo.',
+      )
+    } finally {
+      URL.revokeObjectURL(previewUrl)
+    }
+  }
   
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -266,8 +303,6 @@ function ProfilePage() {
       )
       return
     }
-
-  setIsSaving(true)
 
     setIsSaving(true)
     setError('')
@@ -287,8 +322,11 @@ function ProfilePage() {
           .filter(Boolean),
       })
 
-      setProfile(savedProfile)
-      setForm(toForm(savedProfile))
+      const finalProfile = savedProfile
+
+      setProfile(finalProfile)
+      setForm(toForm(finalProfile))
+      setAvatarPreview(finalProfile.avatarUrl ?? null)
       await refreshUser()
       setIsEditing(false)
       setSuccess('Your profile has been saved.')
@@ -313,7 +351,8 @@ function ProfilePage() {
     }
   }
 
-  const attendingEvents = events.slice(0, 3)
+  const visibleEvents =
+    activeEventsTab === 'attending' ? attendingEvents : events
 
   const fullName = profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
@@ -521,15 +560,34 @@ function ProfilePage() {
                 <div className="profile-page__tabs">
                   <button
                     type="button"
-                    className="profile-page__tab profile-page__tab--active"
+                    className={`profile-page__tab ${
+                      activeEventsTab === 'attending'
+                        ? 'profile-page__tab--active'
+                        : ''
+                    }`}
+                    onClick={() => setActiveEventsTab('attending')}
+                    aria-pressed={activeEventsTab === 'attending'}
                   >
-                    Events
+                    Attending
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`profile-page__tab ${
+                      activeEventsTab === 'organizing'
+                        ? 'profile-page__tab--active'
+                        : ''
+                    }`}
+                    onClick={() => setActiveEventsTab('organizing')}
+                    aria-pressed={activeEventsTab === 'organizing'}
+                  >
+                    Organizing
                   </button>
                 </div>
 
-                {attendingEvents.length ? (
+                {visibleEvents.length ? (
                   <div className="profile-page__event-grid">
-                    {attendingEvents.map((event: Event) => (
+                    {visibleEvents.map((event: Event) => (
                       <a
                         key={event.id}
                         href={`/events/${event.id}`}
@@ -564,7 +622,11 @@ function ProfilePage() {
                     ))}
                   </div>
                 ) : (
-                  <p>You haven't joined or created any events yet.</p>
+                  <p>
+                    {activeEventsTab === 'attending'
+                      ? "You haven't registered for any events yet."
+                      : "You haven't created any events yet."}
+                  </p>
                 )}
               </section>
             </div>
