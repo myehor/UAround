@@ -119,7 +119,6 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     }
   }, [eventId])
 
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [shareMessage, setShareMessage] = useState('')
 
   if (isLoading) {
@@ -199,14 +198,6 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
       setIsRegistrationLoading(false)
     }
   }
-
-  const galleryImages = [
-    event.imageUrl,
-    `https://picsum.photos/seed/uaround-${event.id}-2/800/450`,
-    `https://picsum.photos/seed/uaround-${event.id}-3/800/450`,
-    `https://picsum.photos/seed/uaround-${event.id}-4/800/450`,
-    `https://picsum.photos/seed/uaround-${event.id}-5/800/450`,
-  ]
 
   const visibleParticipants = participants.slice(0, 8)
 
@@ -337,45 +328,13 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
 
         <div className="event-details-page__upper-grid">
           <div className="event-details-page__primary">
+
             <div className="event-details-page__media">
               <div className="event-details-page__hero">
                 <img
-                  src={galleryImages[selectedImageIndex]}
+                  src={event.imageUrl}
                   alt={event.title}
                 />
-              </div>
-
-              <div
-                className="event-details-page__gallery"
-                aria-label="Event photos"
-              >
-                {galleryImages.map((image, index) => (
-                  <button
-                    key={image}
-                    type="button"
-                    className={[
-                      'event-details-page__thumbnail',
-                      index === selectedImageIndex
-                        ? 'event-details-page__thumbnail--active'
-                        : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    onClick={() => setSelectedImageIndex(index)}
-                    aria-label={`View event photo ${index + 1}`}
-                  >
-                    <img src={image} alt="" />
-                  </button>
-                ))}
-
-                <button
-                  type="button"
-                  className="event-details-page__more-photos"
-                  aria-label="View 12 more photos"
-                >
-                  <span>+12</span>
-                  <small>photos</small>
-                </button>
               </div>
             </div>
 

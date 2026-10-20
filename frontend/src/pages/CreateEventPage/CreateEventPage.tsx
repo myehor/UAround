@@ -1,5 +1,6 @@
 
 import { useState } from 'react'
+import eventPlaceholder from '../../assets/images/event-placeholder.png'
 import type { ChangeEvent, FormEvent } from 'react'
 
 import { createEvent } from '../../api/events'
@@ -38,9 +39,8 @@ function CreateEventPage() {
   const [selectedCategory, setSelectedCategory] = useState<EventCategory>('Sport')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const [eventImage, setEventImage] = useState(
-    'https://picsum.photos/seed/uaround-football/800/450',
-  )
+  const [eventImage, setEventImage] = useState(eventPlaceholder)
+  const [eventImageFile, setEventImageFile] = useState<File | null>(null)
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -50,8 +50,10 @@ function CreateEventPage() {
     }
 
     const imageUrl = URL.createObjectURL(file)
+    setEventImageFile(file)
     setEventImage(imageUrl)
   }
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -85,13 +87,30 @@ function CreateEventPage() {
     setIsSubmitting(true)
 
     try {
+      let imageData: string | undefined
+
+      if (eventImageFile) {
+        imageData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+
+          reader.onload = () => {
+            if (typeof reader.result === 'string') {
+              resolve(reader.result)
+            } else {
+              reject(new Error('Failed to read event image.'))
+            }
+          }
+
+          reader.onerror = () => reject(new Error('Failed to read event image.'))
+          reader.readAsDataURL(eventImageFile)
+        })
+      }
+
       const createdEvent = await createEvent({
         title,
         description,
         category: selectedCategory as EventCategory,
-        imageUrl: eventImage.startsWith('http')
-          ? eventImage
-          : 'https://picsum.photos/seed/uaround-event/800/450',
+        ...(imageData ? { imageData } : {}),
         date,
         startTime,
         ...(endTime ? { endTime } : {}),

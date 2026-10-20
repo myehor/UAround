@@ -35,6 +35,7 @@ export type CreateEventPayload = {
     | 'Volunteering'
     | 'Other'
   imageUrl?: string
+  imageData?: string
   date: string
   startTime: string
   endTime?: string
