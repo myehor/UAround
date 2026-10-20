@@ -2,6 +2,9 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { prisma } from './lib/prisma.js';
 
@@ -25,6 +28,7 @@ const createEventSchema = z.object({
   description: z.string().trim().min(10).max(1000),
   category: z.enum(eventCategories),
   imageUrl: z.string().url().max(2000).optional(),
+  imageData: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   startTime: z.string().regex(/^\d{2}:\d{2}$/),
   endTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
@@ -447,6 +451,7 @@ router.get('/my/attending', async (req, res) => {
 
 
 // POST /api/events — создание мероприятия от имени текущего пользователя
+
 router.post('/', async (req, res) => {
   const userId = req.session.userId;
 
@@ -499,6 +504,49 @@ router.post('/', async (req, res) => {
       return;
     }
 
+    let imageUrl = '/images/event-placeholder.png';
+
+    if (data.imageData) {
+      const match = data.imageData.match(
+        /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/,
+      );
+
+      if (!match) {
+        res.status(400).json({
+          message: 'Please upload a valid JPG, PNG, or WebP image.',
+        });
+        return;
+      }
+
+      const extension = match[1] === 'jpeg' ? 'jpg' : match[1];
+      const imageBuffer = Buffer.from(match[2], 'base64');
+
+      if (
+        imageBuffer.length === 0 ||
+        imageBuffer.length > 5 * 1024 * 1024
+      ) {
+        res.status(400).json({
+          message: 'Event image must be no larger than 5 MB.',
+        });
+        return;
+      }
+
+      const uploadsDir = path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        '..',
+        'uploads',
+        'events',
+      );
+
+      await mkdir(uploadsDir, { recursive: true });
+
+      const filename = `${randomUUID()}.${extension}`;
+
+      await writeFile(path.join(uploadsDir, filename), imageBuffer);
+
+      imageUrl = `/uploads/events/${filename}`;
+    }
+
     const now = new Date().toISOString();
     const category =
       data.category === 'IT & Networking'
@@ -511,9 +559,7 @@ router.post('/', async (req, res) => {
         title: data.title,
         description: data.description,
         category,
-        imageUrl:
-          data.imageUrl ??
-          'https://picsum.photos/seed/uaround-event/800/450',
+        imageUrl,
         date: data.date,
         startTime: data.startTime,
         endTime: data.endTime,
