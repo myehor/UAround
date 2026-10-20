@@ -1389,3 +1389,36 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+
+.event-details-page__organizer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-details-page__delete-event {
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid #dc3545;
+  border-radius: 12px;
+  background: #dc3545;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.event-details-page__delete-event:hover:not(:disabled) {
+  background: #bb2d3b;
+  border-color: #bb2d3b;
+}
+
+.event-details-page__delete-event:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

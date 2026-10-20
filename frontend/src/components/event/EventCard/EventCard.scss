@@ -212,3 +212,22 @@
     padding: 24px;
   }
 }
+
+
+.event-card__register--cancel {
+  background: #dc3545;
+}
+
+.event-card__register--cancel:hover {
+  background: #bb2d3b;
+}
+
+.event-card__register--organizer {
+  background: #e8eef2;
+  color: #536779;
+  cursor: default;
+}
+
+.event-card__register--organizer:hover {
+  background: #e8eef2;
+}

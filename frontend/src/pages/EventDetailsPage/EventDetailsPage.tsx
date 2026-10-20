@@ -6,6 +6,7 @@ import {
   cancelEventRegistration,
   getEventRegistrationStatus,
   getEventParticipants,
+  deleteEvent,
   type EventParticipant,
 } from '../../api/events'
 import type { Event } from '../../types/event'
@@ -26,6 +27,9 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
   const [isRegistered, setIsRegistered] = useState(false)
   const [isRegistrationLoading, setIsRegistrationLoading] = useState(false)
   const [registrationError, setRegistrationError] = useState<string | null>(null)
+
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     let isActive = true
@@ -198,6 +202,33 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
       setIsRegistrationLoading(false)
     }
   }
+
+  const handleDeleteEvent = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this event? This action cannot be undone.',
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setIsDeleting(true)
+    setDeleteError(null)
+
+    try {
+      await deleteEvent(event.id)
+      window.location.href = '/events'
+    } catch (error) {
+      setDeleteError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete event.',
+      )
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
 
   const visibleParticipants = participants.slice(0, 8)
 
@@ -542,9 +573,25 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <aside className="event-details-page__sidebar">
             <div className="event-details-page__registration">
               {isOrganizer ? (
+
+              <div className="event-details-page__organizer-actions">
                 <div className="event-details-page__register">
                   You’re the organizer of this event.
                 </div>
+
+                <button
+                  type="button"
+                  className="event-details-page__delete-event"
+                  onClick={handleDeleteEvent}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete event'}
+                </button>
+
+                {deleteError && (
+                  <p role="alert">{deleteError}</p>
+                )}
+              </div>
               ) : (
                 <>
                   {!isRegistered && (

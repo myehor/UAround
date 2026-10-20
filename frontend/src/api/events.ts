@@ -208,3 +208,21 @@ export async function getEventParticipants(
   return data.participants
 }
 
+export async function deleteEvent(
+  eventId: string,
+): Promise<void> {
+  const response = await fetch(
+    `/api/events/${encodeURIComponent(eventId)}`,
+    {
+      method: 'DELETE',
+      credentials: 'include',
+    },
+  )
+
+  const data = (await response.json()) as { message?: string }
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to delete event.')
+  }
+}
+

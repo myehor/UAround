@@ -600,4 +600,52 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const userId = req.session.userId
+
+    if (!userId) {
+      res.status(401).json({ message: 'Authentication required.' })
+      return
+    }
+
+    const event = await prisma.event.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        creatorId: true,
+      },
+    });
+
+    if (!event) {
+      res.status(404).json({ message: 'Event not found.' });
+      return;
+    }
+
+    if (event.creatorId !== userId) {
+      res.status(403).json({
+        message: 'Only the event organizer can delete this event.',
+      });
+      return;
+    }
+
+    await prisma.event.delete({
+      where: { id: event.id },
+    });
+
+    res.status(200).json({
+      message: 'Event deleted successfully.',
+    });
+  } catch (error) {
+    console.error('Failed to delete event:', error);
+
+    res.status(500).json({
+      message: 'Failed to delete event. Please try again later.',
+    });
+  }
+});
+
+
+
 export default router;
