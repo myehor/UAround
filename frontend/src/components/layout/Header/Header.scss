@@ -30,7 +30,7 @@
     align-items: stretch;
     align-self: stretch;
     gap: $spacing-5;
-    margin-left: 72px;
+    margin-left: clamp(20px, 5vw, 72px);
   }
 
   &__link {
@@ -62,50 +62,109 @@
     }
   }
 
-  &__actions {
-    display: flex;
-    align-items: center;
-    gap: $spacing-4;
-    margin-left: auto;
-  }
-
   &__create {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     gap: $spacing-2;
+    margin-left: $spacing-5;
     padding: 10px 16px;
     color: $color-surface;
     background-color: $color-primary;
+    border: 1px solid transparent;
     border-radius: 8px;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
     text-decoration: none;
     white-space: nowrap;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
 
     &:hover {
       background-color: $color-primary-hover;
+      transform: translateY(-1px);
     }
 
-    span {
+    &:focus-visible {
+      outline: 3px solid rgba(86, 142, 170, 0.35);
+      outline-offset: 3px;
+    }
+
+    span:first-child {
       font-size: 18px;
       line-height: 1;
     }
   }
 
-  &__profile {
+  &__account {
     display: flex;
     align-items: center;
-    gap: $spacing-2;
     flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  &__account-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    color: $color-text-secondary;
+  }
+
+  &__account-link,
+  &__login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 5px 14px;
     color: $color-text;
+    background-color: $color-surface;
+    border: 1px solid rgba(227, 235, 239, 0.9);
+    border-radius: 999px;
+    box-shadow: 0 3px 12px rgba(38, 75, 91, 0.08);
     font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
     text-decoration: none;
+    white-space: nowrap;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f7fafc;
+      border-color: rgba(86, 142, 170, 0.5);
+      box-shadow: 0 5px 16px rgba(38, 75, 91, 0.12);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(86, 142, 170, 0.35);
+      outline-offset: 3px;
+    }
+  }
+
+  &__login-icon {
+    font-size: 23px;
+    line-height: 1;
+  }
+
+  &__login-arrow {
+    margin-left: 5px;
+    font-size: 19px;
+    transition: transform 0.2s ease;
+  }
+
+  &__login:hover &__login-arrow {
+    transform: translateX(3px);
   }
 
   &__avatar {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 32px;
@@ -117,90 +176,287 @@
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
   }
+
+  &__profile-name {
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__account-chevron {
+    color: $color-text-secondary;
+    font-size: 17px;
+  }
+
+  &__menu-toggle,
+  &__mobile-menu {
+    display: none;
+  }
 }
 
-@media (max-width: 1024px) {
+/* Tablet */
+@media (max-width: 1023px) {
   .header {
-    &__nav {
-      margin-left: 32px;
-      gap: $spacing-4;
-    }
-
-    &__actions {
-      gap: $spacing-3;
-    }
-
     &__inner {
       padding-right: 12px;
       padding-left: 12px;
     }
-  }
-}
-
-@media (max-width: 760px) {
-  .header {
-    &__inner {
-      min-height: auto;
-      padding: 14px 16px;
-      flex-wrap: wrap;
-      row-gap: 14px;
-    }
 
     &__logo {
-      font-size: 21px;
+      font-size: 20px;
     }
 
     &__nav {
-      order: 3;
-      width: 100%;
-      min-height: 38px;
-      margin-left: 0;
-      gap: 28px;
-      border-top: 1px solid rgba(227, 235, 239, 0.8);
-    }
-
-    &__link {
-      min-height: 38px;
-    }
-
-    &__actions {
-      gap: 12px;
+      gap: 16px;
+      margin-left: 24px;
     }
 
     &__create {
-      padding: 9px 12px;
+      gap: 6px;
+      margin-left: 16px;
+      padding: 9px 11px;
       font-size: 13px;
     }
 
-    &__profile {
-      gap: 6px;
+    &__account-link,
+    &__login {
+      gap: 7px;
+      padding-right: 10px;
+      padding-left: 10px;
     }
 
     &__profile-name {
-      display: none;
+      max-width: 90px;
     }
   }
 }
 
-@media (max-width: 380px) {
+/* Mobile navigation */
+@media (max-width: 767px) {
   .header {
     &__inner {
-      padding: 12px;
+      min-height: 58px;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 14px;
+    }
+
+    &__logo {
+      font-size: 20px;
+    }
+
+    &__nav {
+      display: none;
     }
 
     &__create {
       gap: 5px;
-      padding: 9px;
+      margin-left: auto;
+      padding: 9px 11px;
       font-size: 12px;
     }
 
-    &__actions {
-      gap: 8px;
+    &__create span:first-child {
+      font-size: 17px;
     }
 
-    &__nav {
-      justify-content: space-between;
-      gap: 16px;
+    &__account {
+      margin-left: 0;
     }
+
+    &__account-link,
+    &__login {
+      width: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      padding: 4px;
+      gap: 0;
+    }
+
+    &__login-icon {
+      font-size: 23px;
+    }
+
+    &__login-label,
+    &__login-arrow,
+    &__profile-name,
+    &__account-chevron {
+      display: none;
+    }
+
+    &__avatar {
+      width: 30px;
+      height: 30px;
+    }
+
+    &__menu-toggle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      gap: 5px;
+      width: 40px;
+      height: 40px;
+      padding: 9px;
+      background: transparent;
+      border: 1px solid rgba(227, 235, 239, 0.9);
+      border-radius: 10px;
+      cursor: pointer;
+
+      span {
+        display: block;
+        width: 19px;
+        height: 2px;
+        background-color: $color-text;
+        border-radius: 2px;
+        transition:
+          transform 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      &--open span:first-child {
+        transform: translateY(7px) rotate(45deg);
+      }
+
+      &--open span:nth-child(2) {
+        opacity: 0;
+      }
+
+      &--open span:last-child {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      &:focus-visible {
+        outline: 3px solid rgba(86, 142, 170, 0.35);
+        outline-offset: 2px;
+      }
+    }
+
+    &__mobile-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 12px;
+      background-color: $color-surface;
+      border: 1px solid rgba(227, 235, 239, 0.9);
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(38, 75, 91, 0.14);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0.2s ease;
+
+      &--open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+    }
+
+    &__mobile-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      color: $color-text;
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+      font: inherit;
+      font-size: $font-size-sm;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover,
+      &--active {
+        color: $color-primary;
+        background-color: rgba(86, 142, 170, 0.1);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $color-primary;
+        outline-offset: 1px;
+      }
+    }
+
+    &__mobile-login {
+      justify-content: space-between;
+      margin-top: 5px;
+      border-top: 1px solid rgba(227, 235, 239, 0.9);
+      border-radius: 0 0 9px 9px;
+    }
+
+    &__mobile-logout {
+      color: #b42318;
+    }
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .header {
+    &__inner {
+      gap: 7px;
+      padding: 8px;
+    }
+
+    &__logo {
+      font-size: 18px;
+    }
+
+    &__create {
+      gap: 4px;
+      padding: 8px;
+      font-size: 11px;
+    }
+
+    &__account-link,
+    &__login,
+    &__menu-toggle {
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      min-height: 36px;
+    }
+
+    &__menu-toggle {
+      gap: 4px;
+      padding: 7px;
+
+      span {
+        width: 18px;
+      }
+    }
+
+    &__avatar {
+      width: 28px;
+      height: 28px;
+    }
+
+    &__mobile-menu {
+      right: 12px;
+      left: 12px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header *,
+  .header *::before,
+  .header *::after {
+    transition-duration: 0.01ms !important;
   }
 }
