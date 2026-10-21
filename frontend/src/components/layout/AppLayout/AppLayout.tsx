@@ -1,7 +1,9 @@
+
 import type { ReactNode } from 'react'
 
 import Header from '../Header/Header'
 import Footer from '../Footer/Footer'
+import HelpFeedback from '../../feedback/HelpFeedback/HelpFeedback'
 
 import './AppLayout.scss'
 
@@ -19,6 +21,8 @@ function AppLayout({ children }: AppLayoutProps) {
       </main>
 
       <Footer />
+
+      <HelpFeedback />
     </div>
   )
 }

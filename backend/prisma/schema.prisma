@@ -58,6 +58,7 @@ model User {
   createdEvents Event[]             @relation("EventOwner")
   registrations EventRegistration[]
   authTokens    AuthToken[]
+  feedback      Feedback[]
 
   @@index([bundesland, city])
   @@map("users")
@@ -141,4 +142,35 @@ model UserSession {
 
   @@index([expire], map: "IDX_session_expire")
   @@map("user_sessions")
+}
+
+enum FeedbackType {
+  REPORT_PROBLEM
+  SUGGEST_IDEA
+  ASK_QUESTION
+}
+
+enum FeedbackStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+model Feedback {
+  id          String         @id @default(cuid())
+  type        FeedbackType
+  status      FeedbackStatus @default(NEW)
+  subject     String         @db.VarChar(200)
+  message     String         @db.Text
+  email       String         @db.VarChar(254)
+  pageUrl     String?        @db.VarChar(2048)
+  userId      String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("feedback")
 }
