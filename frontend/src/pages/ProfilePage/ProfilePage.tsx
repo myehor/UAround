@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-
 import { getProfile, updateProfile, uploadAvatar, type UserProfile } from '../../api/profile'
 import {
   getMyEvents,
@@ -108,6 +107,60 @@ function ProfilePage() {
   const [activeEventsTab, setActiveEventsTab] = useState<
     'attending' | 'organizing'
   >('attending')
+
+  const [eventsPage, setEventsPage] = useState(1)
+  const eventsSectionRef = useRef<HTMLElement>(null)
+  
+  useEffect(() => {
+    if (window.location.hash !== '#my-events') {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      eventsSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search,
+      )
+    }, 100)
+
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  const [eventsPerPage, setEventsPerPage] = useState(() => {
+    if (typeof window === 'undefined') return 6
+    if (window.innerWidth <= 767) return 3
+    if (window.innerWidth <= 1023) return 4
+    return 6
+  })
+
+  useEffect(() => {
+    const updateEventsPerPage = () => {
+      const nextPageSize =
+        window.innerWidth <= 767
+          ? 3
+          : window.innerWidth <= 1023
+            ? 4
+            : 6
+
+      setEventsPerPage((current) =>
+        current === nextPageSize ? current : nextPageSize,
+      )
+    }
+
+    updateEventsPerPage()
+    window.addEventListener('resize', updateEventsPerPage)
+
+    return () => {
+      window.removeEventListener('resize', updateEventsPerPage)
+    }
+  }, [])
+
   const [form, setForm] = useState<ProfileForm>(emptyForm)
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>('+49')
   const [isLanguagesOpen, setIsLanguagesOpen] = useState(false)
@@ -351,8 +404,30 @@ function ProfilePage() {
     }
   }
 
+  
   const visibleEvents =
     activeEventsTab === 'attending' ? attendingEvents : events
+
+  const totalEventsPages = Math.ceil(
+    visibleEvents.length / eventsPerPage,
+  )
+
+  const currentEventsPage = Math.min(
+    eventsPage,
+    Math.max(totalEventsPages, 1),
+  )
+
+  useEffect(() => {
+    eventsSectionRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }, [currentEventsPage])
+
+  const paginatedEvents = visibleEvents.slice(
+    (currentEventsPage - 1) * eventsPerPage,
+    currentEventsPage * eventsPerPage,
+  )
 
   const fullName = profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
@@ -412,11 +487,6 @@ function ProfilePage() {
             >
               <span aria-hidden="true">♙</span>
               Profile
-            </a>
-
-            <a href="/my-events" className="profile-page__nav-item">
-              <span aria-hidden="true">▣</span>
-              My Events
             </a>
 
             <a href="/settings" className="profile-page__nav-item">
@@ -548,13 +618,13 @@ function ProfilePage() {
                 </div>
               </section>
 
-              <section className="profile-page__panel">
+              <section
+                id="my-events"
+                ref={eventsSectionRef}
+                className="profile-page__panel"
+              >
                 <div className="profile-page__panel-heading">
                   <h2>My Events</h2>
-
-                  <a href="/my-events" className="profile-page__view-all">
-                    View all <span aria-hidden="true">→</span>
-                  </a>
                 </div>
 
                 <div className="profile-page__tabs">
@@ -565,8 +635,10 @@ function ProfilePage() {
                         ? 'profile-page__tab--active'
                         : ''
                     }`}
-                    onClick={() => setActiveEventsTab('attending')}
-                    aria-pressed={activeEventsTab === 'attending'}
+                    onClick={() => {
+                      setActiveEventsTab('attending')
+                      setEventsPage(1)
+                    }}
                   >
                     Attending
                   </button>
@@ -578,49 +650,101 @@ function ProfilePage() {
                         ? 'profile-page__tab--active'
                         : ''
                     }`}
-                    onClick={() => setActiveEventsTab('organizing')}
-                    aria-pressed={activeEventsTab === 'organizing'}
+                    onClick={() => {
+                      setActiveEventsTab('organizing')
+                      setEventsPage(1)
+                    }}
                   >
                     Organizing
                   </button>
                 </div>
 
-                {visibleEvents.length ? (
-                  <div className="profile-page__event-grid">
-                    {visibleEvents.map((event: Event) => (
-                      <a
-                        key={event.id}
-                        href={`/events/${event.id}`}
-                        className="profile-page__event-card"
-                      >
-                        <div className="profile-page__event-image">
-                          <img src={event.imageUrl} alt="" />
-                        </div>
-
-                        <div className="profile-page__event-content">
-                          <span className="profile-page__event-category">
-                            {event.category}
-                          </span>
-
-                          <h3>{event.title}</h3>
-
-                          <p>
-                            <span aria-hidden="true">▣</span>
-                            {event.date} · {event.startTime}
-                          </p>
-
-                          <p>
-                            <span aria-hidden="true">📍</span>
-                            {event.venue}
-                          </p>
-
-                          <div className="profile-page__event-footer">
-                            <span>{event.registeredCount} going</span>
+                {visibleEvents.length > 0 ? (
+                  <>
+                    <div className="profile-page__event-grid">
+                      {paginatedEvents.map((event: Event) => (
+                        <a
+                          key={event.id}
+                          href={`/events/${event.id}?from=profile`}
+                          className="profile-page__event-card"
+                        >
+                          <div className="profile-page__event-image">
+                            <img src={event.imageUrl} alt="" />
                           </div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
+
+                          <div className="profile-page__event-content">
+                            <span className="profile-page__event-category">
+                              {event.category}
+                            </span>
+
+                            <h3>{event.title}</h3>
+
+                            <p>
+                              <span aria-hidden="true">▣</span>
+                              {event.date} · {event.startTime}
+                            </p>
+
+                            <p>
+                              <span aria-hidden="true">📍</span>
+                              {event.venue}
+                            </p>
+
+                            <div className="profile-page__event-footer">
+                              <span>{event.registeredCount} going</span>
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+
+                    {totalEventsPages > 1 && (
+                      <nav
+                        className="profile-page__pagination"
+                        aria-label="My events pagination"
+                      >
+                        <button
+                          type="button"
+                          className="profile-page__pagination-button"
+                          disabled={currentEventsPage === 1}
+                          onClick={() => setEventsPage((page) => page - 1)}
+                          aria-label="Previous page"
+                        >
+                          ←
+                        </button>
+
+                        {Array.from(
+                          { length: totalEventsPages },
+                          (_, index) => index + 1,
+                        ).map((page) => (
+                          <button
+                            key={page}
+                            type="button"
+                            className={`profile-page__pagination-button ${
+                              currentEventsPage === page
+                                ? 'profile-page__pagination-button--active'
+                                : ''
+                            }`}
+                            aria-current={
+                              currentEventsPage === page ? 'page' : undefined
+                            }
+                            onClick={() => setEventsPage(page)}
+                          >
+                            {page}
+                          </button>
+                        ))}
+
+                        <button
+                          type="button"
+                          className="profile-page__pagination-button"
+                          disabled={currentEventsPage === totalEventsPages}
+                          onClick={() => setEventsPage((page) => page + 1)}
+                          aria-label="Next page"
+                        >
+                          →
+                        </button>
+                      </nav>
+                    )}
+                  </>
                 ) : (
                   <p>
                     {activeEventsTab === 'attending'
@@ -630,7 +754,6 @@ function ProfilePage() {
                 )}
               </section>
             </div>
-
             <aside className="profile-page__right-column">
               <section className="profile-page__panel">
                 <div className="profile-page__panel-heading">

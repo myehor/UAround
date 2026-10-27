@@ -304,11 +304,16 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
     }
   }
 
+  const backUrl =
+    new URLSearchParams(window.location.search).get('from') === 'profile'
+      ? '/profile#my-events'
+      : '/events'
+
   return (
     <main className="event-details-page">
       <div className="event-details-page__container">
         <div className="event-details-page__topbar">
-          <a href="/events" className="event-details-page__back">
+          <a href={backUrl} className="event-details-page__back">
             <span aria-hidden="true">←</span>
             Back to Events
           </a>
