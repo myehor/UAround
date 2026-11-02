@@ -1,5 +1,50 @@
 @use './variables' as *;
 
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-background: #f7fafc;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f4f8fb;
+
+  --color-primary: #5b8fa8;
+  --color-primary-hover: #4e8099;
+  --color-primary-light: #eaf3f7;
+
+  --color-text: #172026;
+  --color-text-secondary: #66737d;
+  --color-border: #e3ebef;
+
+  --color-success: #3f8f68;
+  --color-success-background: #eaf6f0;
+
+  --color-error: #c95c5c;
+  --color-error-background: #fbeded;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #111a24;
+  --color-surface: #1b2835;
+  --color-surface-secondary: #243444;
+
+  --color-primary: #75b4d3;
+  --color-primary-hover: #91c8e2;
+  --color-primary-light: #29475a;
+
+  --color-text: #edf4fa;
+  --color-text-secondary: #a8b8c7;
+  --color-border: #35495b;
+
+  --color-success: #75c69a;
+  --color-success-background: #203d32;
+
+  --color-error: #f08b8b;
+  --color-error-background: #482b32;
+}
+
 * {
   box-sizing: border-box;
 }

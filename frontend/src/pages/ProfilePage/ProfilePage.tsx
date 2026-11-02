@@ -6,6 +6,7 @@ import {
   getAttendingEvents,
 } from '../../api/events'
 import { useAuth } from '../../context/useAuth'
+import { useTheme } from '../../context/useTheme'
 import { bundeslaender, getCities } from '../../data/locations'
 import type { Event } from '../../types/event'
 
@@ -100,6 +101,7 @@ const AVAILABLE_LANGUAGES = [
 
 function ProfilePage() {
   const { refreshUser, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [events, setEvents] = useState<Event[]>([])
@@ -489,17 +491,41 @@ function ProfilePage() {
               Profile
             </a>
 
-            <a href="/settings" className="profile-page__nav-item">
-              <span aria-hidden="true">⚙</span>
-              Settings
-            </a>
+            <div className="profile-page__theme">
+              <div className="profile-page__theme-label">
+                <span aria-hidden="true">☾</span>
+                Theme
+              </div>
+
+              <button
+                type="button"
+                className={`profile-page__theme-toggle ${
+                  theme === 'dark' ? 'profile-page__theme-toggle--dark' : ''
+                }`}
+                onClick={toggleTheme}
+                aria-label="Toggle dark theme"
+                aria-pressed={theme === 'dark'}
+              >
+                <span className="profile-page__theme-icon" aria-hidden="true">
+                  ☼
+                </span>
+
+                <span className="profile-page__theme-track">
+                  <span className="profile-page__theme-thumb" />
+                </span>
+
+                <span className="profile-page__theme-icon" aria-hidden="true">
+                  ☾
+                </span>
+              </button>
+            </div>
 
             <button
               type="button"
               className="profile-page__nav-item profile-page__nav-item--logout"
               onClick={handleLogout}
             >
-              <span aria-hidden="true">↪</span>
+              <span aria-hidden="true">⇥</span>
               Log out
             </button>
           </nav>

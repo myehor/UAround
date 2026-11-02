@@ -272,3 +272,61 @@
     margin-top: 24px;
   }
 }
+
+// Dark theme
+:root[data-theme='dark'] {
+  .footer {
+    background: linear-gradient(
+      135deg,
+      #142330 0%,
+      #172a3a 50%,
+      #142330 100%
+    );
+  }
+
+  .footer__waves::before {
+    background: rgba(35, 65, 86, 0.65);
+  }
+
+  .footer__waves::after {
+    background: rgba(20, 35, 48, 0.95);
+  }
+
+  .footer__logo {
+    color: #69afd2;
+  }
+
+  .footer__description {
+    color: #b0c4d3;
+  }
+
+  .footer__socials a {
+    color: #a9cce0;
+    background-color: #263e50;
+
+    &:hover {
+      color: #ffffff;
+      background-color: $color-primary;
+    }
+  }
+
+  .footer__column h3 {
+    color: #e8f1f7;
+  }
+
+  .footer__column a {
+    color: #a9bdcc;
+
+    &:hover {
+      color: #69afd2;
+    }
+  }
+
+  .footer__bottom {
+    border-top-color: rgba(130, 164, 188, 0.25);
+  }
+
+  .footer__bottom p {
+    color: #91a9ba;
+  }
+}
