@@ -231,3 +231,45 @@
 .event-card__register--organizer:hover {
   background: #e8eef2;
 }
+
+// Dark theme
+:root[data-theme='dark'] {
+  .event-card {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+  }
+
+  .event-card__title {
+    color: var(--color-text);
+  }
+
+  .event-card__info p,
+  .event-card__participants {
+    color: var(--color-text-secondary);
+  }
+
+  .event-card__category {
+    color: var(--color-primary);
+  }
+
+  .event-card__avatar {
+    border-color: var(--color-surface);
+  }
+
+  .event-card--featured .event-card__category {
+    background: var(--color-primary-light);
+  }
+
+  .event-card__register--organizer {
+    background: var(--color-surface-secondary);
+    color: var(--color-text-secondary);
+  }
+
+  .event-card__register--organizer:hover {
+    background: var(--color-surface-secondary);
+  }
+
+  .event-card__registration-error {
+    color: var(--color-error);
+  }
+}

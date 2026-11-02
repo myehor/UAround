@@ -222,3 +222,68 @@
     gap: 16px;
   }
 }
+
+// Dark theme
+:root[data-theme='dark'] {
+  .events-page {
+    min-height: 100vh;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .events-page__hero-overlay {
+    background: linear-gradient(
+      90deg,
+      rgba(17, 26, 36, 0.96) 0%,
+      rgba(17, 26, 36, 0.82) 38%,
+      rgba(17, 26, 36, 0.35) 72%,
+      rgba(17, 26, 36, 0.08) 100%
+    );
+  }
+
+  .events-page__hero-content h1 {
+    color: #edf4fa;
+  }
+
+  .events-page__hero-content p {
+    color: #c0d0dd;
+  }
+
+  .events-page__community {
+    background-color: rgba(27, 40, 53, 0.96);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .events-page__community-icon {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  .events-page__community-title {
+    color: var(--color-text-secondary);
+  }
+
+  .events-page__community-count {
+    color: var(--color-text);
+  }
+
+  .events-page__community-count span {
+    color: var(--color-primary);
+  }
+
+  .events-page__results {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 575px) {
+    .events-page__hero-overlay {
+      background: linear-gradient(
+        180deg,
+        rgba(17, 26, 36, 0.96) 0%,
+        rgba(17, 26, 36, 0.78) 48%,
+        rgba(17, 26, 36, 0.2) 100%
+      );
+    }
+  }
+}

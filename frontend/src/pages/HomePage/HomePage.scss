@@ -143,3 +143,58 @@
     }
   }
 }
+
+// Dark theme
+:root[data-theme='dark'] {
+  .home-page {
+    background: var(--color-background);
+    color: var(--color-text);
+
+    &__hero-overlay {
+      background: linear-gradient(
+        90deg,
+        rgba(17, 26, 36, 0.96) 0%,
+        rgba(17, 26, 36, 0.82) 35%,
+        rgba(17, 26, 36, 0.12) 75%
+      );
+    }
+
+    &__eyebrow {
+      color: var(--color-primary);
+    }
+
+    h1 {
+      color: #edf4fa;
+    }
+
+    &__description {
+      color: #c0d0dd;
+    }
+
+    &__location {
+      color: var(--color-text);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background-color: var(--color-surface-secondary);
+      }
+    }
+
+    &__location-icon {
+      color: var(--color-primary);
+    }
+  }
+
+  @media (max-width: 575px) {
+    .home-page__hero-overlay {
+      background: linear-gradient(
+        180deg,
+        rgba(17, 26, 36, 0.96) 0%,
+        rgba(17, 26, 36, 0.82) 55%,
+        rgba(17, 26, 36, 0.35) 100%
+      );
+    }
+  }
+}

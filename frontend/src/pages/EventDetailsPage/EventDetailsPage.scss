@@ -1422,3 +1422,207 @@
   cursor: wait;
   opacity: 0.65;
 }
+
+// Dark theme
+:root[data-theme='dark'] {
+  .event-details-page {
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  // Navigation
+  .event-details-page__back,
+  .event-details-page__similar-heading a {
+    color: var(--color-primary);
+  }
+
+  .event-details-page__top-share,
+  .event-details-page__maps-button,
+  .event-details-page__organizer-profile-button {
+    background: var(--color-surface-secondary);
+    border-color: var(--color-border);
+    color: var(--color-primary);
+
+    &:hover {
+      background: var(--color-primary-light);
+    }
+  }
+
+  .event-details-page__share-message {
+    background: var(--color-surface-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  // Gallery
+  .event-details-page__hero,
+  .event-details-page__thumbnail,
+  .event-details-page__more-photos,
+  .event-details-page__similar-image {
+    background: var(--color-surface-secondary);
+  }
+
+  .event-details-page__more-photos {
+    color: var(--color-primary);
+
+    &:hover {
+      background: var(--color-primary-light);
+    }
+  }
+
+  // Heading
+  .event-details-page__heading h1,
+  .event-details-page__similar-heading h2,
+  .event-details-page__panel h2,
+  .event-details-page__organizer-card h2,
+  .event-details-page__participants-heading h2,
+  .event-details-page__not-found h1 {
+    color: var(--color-text);
+  }
+
+  .event-details-page__heading p,
+  .event-details-page__fact span,
+  .event-details-page__about-main p,
+  .event-details-page__bring li,
+  .event-details-page__about-info small,
+  .event-details-page__venue-address p,
+  .event-details-page__directions p,
+  .event-details-page__registration-subtitle,
+  .event-details-page__registration-thanks,
+  .event-details-page__registration-hint,
+  .event-details-page__capacity p,
+  .event-details-page__benefits small,
+  .event-details-page__organizer-event span,
+  .event-details-page__similar-meta,
+  .event-details-page__similar-going small,
+  .event-details-page__not-found p {
+    color: var(--color-text-secondary);
+  }
+
+  .event-details-page__category {
+    background: var(--color-success-background);
+    color: var(--color-success);
+  }
+
+  // Facts and panels
+  .event-details-page__facts,
+  .event-details-page__fact,
+  .event-details-page__bring,
+  .event-details-page__about-info > div,
+  .event-details-page__directions,
+  .event-details-page__mini-participants,
+  .event-details-page__organizer-events {
+    border-color: var(--color-border);
+  }
+
+  .event-details-page__fact strong,
+  .event-details-page__bring h3,
+  .event-details-page__about-info strong,
+  .event-details-page__venue-address strong,
+  .event-details-page__directions h3,
+  .event-details-page__capacity strong,
+  .event-details-page__benefits strong,
+  .event-details-page__organizer-profile strong,
+  .event-details-page__organizer-events-heading h3,
+  .event-details-page__organizer-event strong,
+  .event-details-page__similar-content h3 {
+    color: var(--color-text);
+  }
+
+  .event-details-page__fact-icon,
+  .event-details-page__about-info > div > span,
+  .event-details-page__venue-address > span,
+  .event-details-page__benefits > div > span {
+    background: var(--color-primary-light);
+  }
+
+  .event-details-page__panel,
+  .event-details-page__registration,
+  .event-details-page__organizer-card,
+  .event-details-page__participants-panel,
+  .event-details-page__similar-card,
+  .event-details-page__not-found {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  .event-details-page__about-info {
+    background: var(--color-surface-secondary);
+    border-color: var(--color-border);
+  }
+
+  .event-details-page__map {
+    background: var(--color-surface-secondary);
+  }
+
+  // Registration
+  .event-details-page__capacity-bar {
+    background: var(--color-surface-secondary);
+  }
+
+  .event-details-page__mini-participants > strong {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  .event-details-page__registration-success h3 {
+    color: var(--color-success);
+  }
+
+  .event-details-page__cancel-registration {
+    background: var(--color-error-background);
+    border-color: var(--color-border);
+    color: var(--color-error);
+
+    &:hover:not(:disabled) {
+      background: var(--color-error-background);
+      border-color: var(--color-error);
+      color: var(--color-error);
+    }
+  }
+
+  // Organizer
+  .event-details-page__organizer-avatar {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  .event-details-page__organizer-profile span,
+  .event-details-page__similar-category {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  // Participants
+  .event-details-page__participants-heading h2 span {
+    color: var(--color-text-secondary);
+  }
+
+  .event-details-page__participant-avatar,
+  .event-details-page__participants-more {
+    border-color: var(--color-surface);
+  }
+
+  .event-details-page__participants-more {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+  }
+
+  // Similar events
+  .event-details-page__similar-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.24);
+  }
+
+  .event-details-page__similar-footer button {
+    background: var(--color-primary);
+
+    &:hover {
+      background: var(--color-primary-hover);
+    }
+  }
+
+  .event-details-page__not-found a {
+    color: var(--color-primary);
+  }
+}
