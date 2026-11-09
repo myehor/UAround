@@ -18,11 +18,20 @@
   }
 
   &__logo {
+    display: flex;
+    align-items: center;
     flex-shrink: 0;
-    color: $color-primary;
-    font-size: 22px;
-    font-weight: $font-weight-bold;
+    padding: 6px 8px;
+    margin-left: -8px;
     text-decoration: none;
+
+    img {
+      display: block;
+      width: auto;
+      height: 44px;
+      max-width: 190px;
+      object-fit: contain;
+    }
   }
 
   &__nav {

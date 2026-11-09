@@ -16,22 +16,32 @@ function AuthLayout({
     <main className="auth-layout">
       <div className="auth-layout__container">
         <section className="auth-layout__visual">
-          <div className="auth-layout__visual-overlay" />
-
           <div className="auth-layout__brand">
-            UAround
+            <img
+              src="/images/uaround-logo.png"
+              alt="UAround"
+            />
           </div>
 
           <div className="auth-layout__message">
-            <h1>
-              {title}
-            </h1>
+            <h1>{title}</h1>
 
             <div className="auth-layout__divider" />
 
-            <p>
-              {description}
-            </p>
+            <p>{description}</p>
+          </div>
+
+          <div
+            className="auth-layout__visual-art"
+            aria-hidden="true"
+          >
+            <div className="auth-layout__route">
+              <span className="auth-layout__pin" />
+            </div>
+
+            <div className="auth-layout__photo">
+              <div className="auth-layout__photo-backdrop" />
+            </div>
           </div>
         </section>
 

@@ -42,8 +42,12 @@ function Header() {
             className="header__logo"
             href="/"
             onClick={closeMobileMenu}
+            aria-label="UAround — Home"
           >
-            UAround
+            <img
+              src="/images/uaround-logo.png"
+              alt="UAround"
+            />
           </a>
 
           <nav className="header__nav" aria-label="Main navigation">

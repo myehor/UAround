@@ -1,3 +1,4 @@
+
 import AppLayout from './components/layout/AppLayout/AppLayout'
 import EmailConfirmationPage from './components/auth/EmailConfirmationPage/EmailConfirmationPage'
 import EmailConfirmedPage from './components/auth/EmailConfirmedPage/EmailConfirmedPage'
@@ -10,6 +11,7 @@ import EventDetailsPage from './pages/EventDetailsPage/EventDetailsPage'
 import EventsPage from './pages/EventsPage/EventsPage'
 import HomePage from './pages/HomePage/HomePage'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
+import WelcomePage from './pages/WelcomePage/WelcomePage'
 
 function App() {
   const pathname = window.location.pathname
@@ -19,6 +21,14 @@ function App() {
   )
 
   const renderPage = () => {
+    if (pathname === '/') {
+      return <WelcomePage />
+    }
+
+    if (pathname === '/home') {
+      return <HomePage />
+    }
+
     if (pathname === '/register') {
       return <RegisterPage />
     }
@@ -66,6 +76,8 @@ function App() {
     return <HomePage />
   }
 
+  const isWelcomePage = pathname === '/'
+
   const isAuthPage =
     pathname === '/register' ||
     pathname === '/login' ||
@@ -74,7 +86,7 @@ function App() {
     pathname === '/forgot-password' ||
     pathname === '/reset-password'
 
-  if (isAuthPage) {
+  if (isWelcomePage || isAuthPage) {
     return renderPage()
   }
 
