@@ -29,7 +29,27 @@ Users can explore events, register for activities, create their own events, and 
 
 ## Screenshots
 
-*Application screenshots coming soon.*
+<p align="center">
+  <img src="docs/screenshots/welcome-page.png" alt="UAround Welcome Page" width="100%">
+</p>
+
+<h3 align="center">Events Discovery</h3>
+
+<p align="center">
+  <img src="docs/screenshots/events-page.png" alt="UAround Events Page" width="100%">
+</p>
+
+<h3 align="center">Event Details</h3>
+
+<p align="center">
+  <img src="docs/screenshots/event-details.png" alt="UAround Event Details" width="100%">
+</p>
+
+<h3 align="center">User Profile</h3>
+
+<p align="center">
+  <img src="docs/screenshots/profile-page.png" alt="UAround User Profile" width="100%">
+</p>
 
 ## Tech Stack
 
