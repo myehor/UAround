@@ -13,12 +13,14 @@ import {
 } from '../api/auth';
 
 import { AuthContext } from './auth-context';
+import { useTheme } from './useTheme';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const { resetTheme } = useTheme();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -65,7 +67,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(async () => {
     await logoutUser();
     setUser(null);
-  }, []);
+    resetTheme();
+  }, [resetTheme]);
 
   return (
     <AuthContext.Provider

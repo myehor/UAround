@@ -12,7 +12,7 @@ interface ThemeProviderProps {
 }
 
 function getInitialTheme(): Theme {
-  const savedTheme = localStorage.getItem('uaround-theme')
+  const savedTheme = sessionStorage.getItem('uaround-theme')
 
   return savedTheme === 'dark' ? 'dark' : 'light'
 }
@@ -24,13 +24,17 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setTheme((current) => (current === 'light' ? 'dark' : 'light'))
   }, [])
 
+  const resetTheme = useCallback(() => {
+    setTheme('light')
+  }, [])
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('uaround-theme', theme)
+    sessionStorage.setItem('uaround-theme', theme)
   }, [theme])
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, resetTheme }}>
       {children}
     </ThemeContext.Provider>
   )

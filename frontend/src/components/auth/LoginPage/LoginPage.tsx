@@ -22,7 +22,7 @@ function LoginPage() {
         password: String(formData.get('password') ?? ''),
       })
 
-      window.location.assign('/')
+      window.location.assign('/home')
     } catch (err) {
       setError(
         err instanceof Error
