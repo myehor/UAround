@@ -1,65 +1,61 @@
-
-import { useEffect, useState, type KeyboardEvent } from 'react'
+import { useEffect, useState, type KeyboardEvent } from "react";
 
 import {
   cancelEventRegistration,
   getEventRegistrationStatus,
   registerForEvent,
-} from '../../../api/events'
-import { useAuth } from '../../../context/useAuth'
-import type { Event } from '../../../types/event'
+} from "../../../api/events";
+import { useAuth } from "../../../context/useAuth";
+import type { Event } from "../../../types/event";
 
-import './EventCard.scss'
+import "./EventCard.scss";
 
 type EventCardProps = {
-  event: Event
-  variant?: 'default' | 'featured'
-}
+  event: Event;
+  variant?: "default" | "featured";
+};
 
-function EventCard({
-  event,
-  variant = 'default',
-}: EventCardProps) {
-  const { user } = useAuth()
-  const isFeatured = variant === 'featured'
+function EventCard({ event, variant = "default" }: EventCardProps) {
+  const { user } = useAuth();
+  const isFeatured = variant === "featured";
   const isOrganizer =
-    user?.id === event.creatorId || user?.id === event.createdBy?.id
+    user?.id === event.creatorId || user?.id === event.createdBy?.id;
 
-  const [isRegistered, setIsRegistered] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(false);
   const [registeredCount, setRegisteredCount] = useState(
     event.registeredCount ?? 0,
-  )
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     if (!user || isOrganizer) {
       return () => {
-        isActive = false
-      }
+        isActive = false;
+      };
     }
 
     const loadStatus = async () => {
       try {
-        const result = await getEventRegistrationStatus(event.id)
+        const result = await getEventRegistrationStatus(event.id);
 
         if (isActive) {
-          setIsRegistered(result.isRegistered)
+          setIsRegistered(result.isRegistered);
         }
       } catch {
         if (isActive) {
-          setError('Could not check registration status.')
+          setError("Could not check registration status.");
         }
       }
-    }
+    };
 
-    void loadStatus()
+    void loadStatus();
 
     return () => {
-      isActive = false
-    }
+      isActive = false;
+    };
   }, [
     event.id,
     event.registeredCount,
@@ -67,76 +63,66 @@ function EventCard({
     event.createdBy?.id,
     isOrganizer,
     user,
-  ])
+  ]);
 
   const handleCardClick = () => {
-    window.location.href = `/events/${event.id}`
-  }
+    window.location.href = `/events/${event.id}`;
+  };
 
-  const handleCardKeyDown = (
-    keyboardEvent: KeyboardEvent<HTMLElement>,
-  ) => {
-    if (
-      keyboardEvent.target !== keyboardEvent.currentTarget
-    ) {
-      return
+  const handleCardKeyDown = (keyboardEvent: KeyboardEvent<HTMLElement>) => {
+    if (keyboardEvent.target !== keyboardEvent.currentTarget) {
+      return;
     }
 
-    if (
-      keyboardEvent.key === 'Enter' ||
-      keyboardEvent.key === ' '
-    ) {
-      keyboardEvent.preventDefault()
-      handleCardClick()
+    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+      keyboardEvent.preventDefault();
+      handleCardClick();
     }
-  }
+  };
 
   const handleRegistration = async (
     clickEvent: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    clickEvent.stopPropagation()
+    clickEvent.stopPropagation();
 
     if (isLoading || isOrganizer) {
-      return
+      return;
     }
 
     if (!user) {
-      window.location.href = '/login'
-      return
+      window.location.href = "/login";
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       if (isRegistered) {
-        await cancelEventRegistration(event.id)
-        setIsRegistered(false)
-        setRegisteredCount((count) => Math.max(0, count - 1))
+        await cancelEventRegistration(event.id);
+        setIsRegistered(false);
+        setRegisteredCount((count) => Math.max(0, count - 1));
       } else {
-        await registerForEvent(event.id)
-        setIsRegistered(true)
-        setRegisteredCount((count) => count + 1)
+        await registerForEvent(event.id);
+        setIsRegistered(true);
+        setRegisteredCount((count) => count + 1);
       }
     } catch (registrationError) {
       setError(
         registrationError instanceof Error
           ? registrationError.message
-          : 'Failed to update registration.',
-      )
+          : "Failed to update registration.",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <article
-      className={[
-        'event-card',
-        isFeatured && 'event-card--featured',
-      ]
+      className={["event-card", isFeatured && "event-card--featured"]
         .filter(Boolean)
-        .join(' ')}
+        .join(" ")}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role="link"
@@ -147,9 +133,7 @@ function EventCard({
       </div>
 
       <div className="event-card__content">
-        <span className="event-card__category">
-          {event.category}
-        </span>
+        <span className="event-card__category">{event.category}</span>
 
         <h3 className="event-card__title">{event.title}</h3>
 
@@ -176,29 +160,29 @@ function EventCard({
           <button
             type="button"
             className={[
-              'event-card__register',
-              isRegistered && 'event-card__register--cancel',
-              isOrganizer && 'event-card__register--organizer',
+              "event-card__register",
+              isRegistered && "event-card__register--cancel",
+              isOrganizer && "event-card__register--organizer",
             ]
               .filter(Boolean)
-              .join(' ')}
+              .join(" ")}
             onClick={handleRegistration}
             disabled={isLoading || isOrganizer}
             aria-label={
               isOrganizer
-                ? 'You are the organizer'
+                ? "You are the organizer"
                 : isRegistered
-                  ? 'Cancel registration'
-                  : 'Register for event'
+                  ? "Cancel registration"
+                  : "Register for event"
             }
           >
             {isOrganizer
-              ? 'Organizer'
+              ? "Organizer"
               : isLoading
-                ? 'Please wait...'
+                ? "Please wait..."
                 : isRegistered
-                  ? 'Cancel'
-                  : 'Register'}
+                  ? "Cancel"
+                  : "Register"}
           </button>
         </div>
 
@@ -209,7 +193,7 @@ function EventCard({
         )}
       </div>
     </article>
-  )
+  );
 }
 
-export default EventCard
+export default EventCard;

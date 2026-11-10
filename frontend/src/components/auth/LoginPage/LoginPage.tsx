@@ -1,36 +1,35 @@
-
-import { useState, type FormEvent } from 'react'
-import AuthLayout from '../../../components/auth/AuthLayout/AuthLayout'
-import { loginUser } from '../../../api/auth'
-import './LoginPage.scss'
+import { useState, type FormEvent } from "react";
+import AuthLayout from "../../../components/auth/AuthLayout/AuthLayout";
+import { loginUser } from "../../../api/auth";
+import "./LoginPage.scss";
 
 function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError('')
-    setIsSubmitting(true)
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    const formData = new FormData(event.currentTarget)
+    const formData = new FormData(event.currentTarget);
 
     try {
       await loginUser({
-        email: String(formData.get('email') ?? '').trim(),
-        password: String(formData.get('password') ?? ''),
-      })
+        email: String(formData.get("email") ?? "").trim(),
+        password: String(formData.get("password") ?? ""),
+      });
 
-      window.location.assign('/home')
+      window.location.assign("/home");
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : 'Sign in failed. Please try again.',
-      )
+          : "Sign in failed. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -63,7 +62,7 @@ function LoginPage() {
             <div className="login-page__password">
               <input
                 id="login-password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 autoComplete="current-password"
@@ -74,9 +73,9 @@ function LoginPage() {
                 type="button"
                 className="login-page__password-toggle"
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? '◉' : '◌'}
+                {showPassword ? "◉" : "◌"}
               </button>
             </div>
           </div>
@@ -96,17 +95,16 @@ function LoginPage() {
             className="login-page__submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <p className="login-page__register">
-          Don’t have an account?{' '}
-          <a href="/register">Create account</a>
+          Don’t have an account? <a href="/register">Create account</a>
         </p>
       </div>
     </AuthLayout>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;

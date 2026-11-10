@@ -1,74 +1,65 @@
-
 import {
   useEffect,
   useState,
   type KeyboardEvent,
   type MouseEvent,
-} from 'react'
+} from "react";
 
-import { getEvents } from '../../../api/events'
-import type { Event } from '../../../types/event'
+import { getEvents } from "../../../api/events";
+import type { Event } from "../../../types/event";
 
-import './EventsNearYou.scss'
+import "./EventsNearYou.scss";
 
 function EventsNearYou() {
-  const [events, setEvents] = useState<Event[]>([])
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     const loadEvents = async () => {
       try {
-        const data = await getEvents()
+        const data = await getEvents();
 
         if (isActive) {
-          setEvents(data)
+          setEvents(data);
         }
       } catch (error) {
-        console.error('Failed to load nearby events:', error)
+        console.error("Failed to load nearby events:", error);
       }
-    }
+    };
 
-    void loadEvents()
+    void loadEvents();
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
-  const nearbyEvents = events.slice(0, 3)
+  const nearbyEvents = events.slice(0, 3);
 
   const handleCardClick = (eventId: string) => {
-    window.location.assign(`/events/${eventId}`)
-  }
+    window.location.assign(`/events/${eventId}`);
+  };
 
   const handleCardKeyDown = (
     keyboardEvent: KeyboardEvent<HTMLElement>,
     eventId: string,
   ) => {
-    if (
-      keyboardEvent.key === 'Enter' ||
-      keyboardEvent.key === ' '
-    ) {
-      keyboardEvent.preventDefault()
-      handleCardClick(eventId)
+    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+      keyboardEvent.preventDefault();
+      handleCardClick(eventId);
     }
-  }
+  };
 
-  const handleRegisterClick = (
-    event: MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.stopPropagation()
-  }
+  const handleRegisterClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
 
   return (
     <section className="events-near-you">
       <div className="events-near-you__header">
         <div className="events-near-you__heading">
-          <span
-            className="events-near-you__icon"
-            aria-hidden="true"
-          >
+          <span className="events-near-you__icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -93,9 +84,7 @@ function EventsNearYou() {
           </span>
 
           <div>
-            <p className="events-near-you__eyebrow">
-              Events near you
-            </p>
+            <p className="events-near-you__eyebrow">Events near you</p>
 
             <p className="events-near-you__subtitle">
               Events in your area · within 20 km
@@ -103,10 +92,7 @@ function EventsNearYou() {
           </div>
         </div>
 
-        <a
-          href="/events"
-          className="events-near-you__view-all"
-        >
+        <a href="/events" className="events-near-you__view-all">
           View all
           <span aria-hidden="true">→</span>
         </a>
@@ -125,10 +111,7 @@ function EventsNearYou() {
             tabIndex={0}
           >
             <div className="events-near-you__image">
-              <img
-                src={event.imageUrl}
-                alt=""
-              />
+              <img src={event.imageUrl} alt="" />
             </div>
 
             <div className="events-near-you__content">
@@ -136,9 +119,7 @@ function EventsNearYou() {
                 {event.category}
               </span>
 
-              <h3 className="events-near-you__title">
-                {event.title}
-              </h3>
+              <h3 className="events-near-you__title">{event.title}</h3>
 
               <div className="events-near-you__info">
                 <p>
@@ -156,9 +137,7 @@ function EventsNearYou() {
                     <span>O</span>
                   </div>
 
-                  <span>
-                    {event.registeredCount} going
-                  </span>
+                  <span>{event.registeredCount} going</span>
                 </div>
 
                 <button
@@ -174,7 +153,7 @@ function EventsNearYou() {
         ))}
       </div>
     </section>
-  )
+  );
 }
 
-export default EventsNearYou
+export default EventsNearYou;

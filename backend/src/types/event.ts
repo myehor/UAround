@@ -1,21 +1,17 @@
 export type EventCategory =
-  | 'Sport'
-  | 'Party'
-  | 'Social'
-  | 'Music'
-  | 'IT & Networking'
-  | 'Education'
-  | 'Family'
-  | 'Culture'
-  | 'Volunteering'
-  | 'Other';
+  | "Sport"
+  | "Party"
+  | "Social"
+  | "Music"
+  | "IT & Networking"
+  | "Education"
+  | "Family"
+  | "Culture"
+  | "Volunteering"
+  | "Other";
 
 export type EventStatus =
-  | 'open'
-  | 'almost-full'
-  | 'fully-booked'
-  | 'closed'
-  | 'cancelled';
+  "open" | "almost-full" | "fully-booked" | "closed" | "cancelled";
 
 export type Event = {
   id: string;
@@ -40,11 +36,11 @@ export type Event = {
 
   creatorId: string;
   createdBy?: {
-    id: string
-    firstName: string
-    lastName: string
-    avatarUrl: string | null
-  } | null
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };

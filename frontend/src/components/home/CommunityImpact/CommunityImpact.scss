@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .community-impact {
   position: relative;
@@ -127,19 +127,15 @@
     rgba(234, 246, 252, 0.08) 40%,
     transparent 55%
   );
-  content: '';
+  content: "";
 }
 
 .community-impact__visual::after {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
-    0deg,
-    rgba(16, 47, 82, 0.18),
-    transparent 65%
-  );
-  content: '';
+  background: linear-gradient(0deg, rgba(16, 47, 82, 0.18), transparent 65%);
+  content: "";
 }
 
 /* Decorative text */
@@ -189,7 +185,7 @@
   height: 75px;
   border: 2px solid rgba(122, 198, 91, 0.35);
   border-radius: 50%;
-  content: '';
+  content: "";
 }
 
 .community-impact__decor--bottom {

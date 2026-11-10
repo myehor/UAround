@@ -1,7 +1,7 @@
-@use './variables' as *;
+@use "./variables" as *;
 
 :root,
-:root[data-theme='light'] {
+:root[data-theme="light"] {
   color-scheme: light;
 
   --color-background: #f7fafc;
@@ -23,7 +23,7 @@
   --color-error-background: #fbeded;
 }
 
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   color-scheme: dark;
 
   --color-background: #111a24;

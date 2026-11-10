@@ -1,24 +1,22 @@
-import { useState } from 'react'
-import type { EventCategory } from '../../../types/event'
-import { bundeslaender, getCities } from '../../../data/locations'
+import { useState } from "react";
+import type { EventCategory } from "../../../types/event";
+import { bundeslaender, getCities } from "../../../data/locations";
 
-import './EventFilters.scss'
+import "./EventFilters.scss";
 
 type EventFiltersProps = {
-  selectedCategory: EventCategory | ''
-  onCategoryChange: (
-    category: EventCategory | '',
-  ) => void
-  selectedBundesland: string
-  selectedCity: string
-  selectedDateFrom: string
-  selectedDateTo: string
-  onBundeslandChange: (bundesland: string) => void
-  onCityChange: (city: string) => void
-  onDateFromChange: (date: string) => void
-  onDateToChange: (date: string) => void
-  onReset: () => void
-}
+  selectedCategory: EventCategory | "";
+  onCategoryChange: (category: EventCategory | "") => void;
+  selectedBundesland: string;
+  selectedCity: string;
+  selectedDateFrom: string;
+  selectedDateTo: string;
+  onBundeslandChange: (bundesland: string) => void;
+  onCityChange: (city: string) => void;
+  onDateFromChange: (date: string) => void;
+  onDateToChange: (date: string) => void;
+  onReset: () => void;
+};
 
 function EventFilters({
   selectedCategory,
@@ -33,9 +31,9 @@ function EventFilters({
   onDateToChange,
   onReset,
 }: EventFiltersProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
-  const availableCities = getCities(selectedBundesland)
+  const availableCities = getCities(selectedBundesland);
 
   const activeFilterCount = [
     selectedBundesland,
@@ -43,25 +41,22 @@ function EventFilters({
     selectedDateFrom,
     selectedDateTo,
     selectedCategory,
-  ].filter(Boolean).length
+  ].filter(Boolean).length;
 
   const handleBundeslandChange = (value: string) => {
-    onBundeslandChange(value)
-    onCityChange('')
-  }
+    onBundeslandChange(value);
+    onCityChange("");
+  };
 
   const handleReset = () => {
-    onReset()
-  }
+    onReset();
+  };
 
   return (
     <aside
-      className={[
-        'event-filters',
-        isOpen && 'event-filters--open',
-      ]
+      className={["event-filters", isOpen && "event-filters--open"]
         .filter(Boolean)
-        .join(' ')}
+        .join(" ")}
     >
       <div className="event-filters__mobile-header">
         <button
@@ -74,17 +69,12 @@ function EventFilters({
             <span aria-hidden="true">☷</span>
             Filters
             {activeFilterCount > 0 && (
-              <span className="event-filters__count">
-                {activeFilterCount}
-              </span>
+              <span className="event-filters__count">{activeFilterCount}</span>
             )}
           </span>
 
-          <span
-            className="event-filters__chevron"
-            aria-hidden="true"
-          >
-            {isOpen ? '−' : '+'}
+          <span className="event-filters__chevron" aria-hidden="true">
+            {isOpen ? "−" : "+"}
           </span>
         </button>
       </div>
@@ -93,10 +83,7 @@ function EventFilters({
         <div className="event-filters__header">
           <h2>Filters</h2>
 
-          <button
-            type="button"
-            onClick={handleReset}
-          >
+          <button type="button" onClick={handleReset}>
             Reset
           </button>
         </div>
@@ -109,17 +96,12 @@ function EventFilters({
 
             <select
               value={selectedBundesland}
-              onChange={(event) =>
-                handleBundeslandChange(event.target.value)
-              }
+              onChange={(event) => handleBundeslandChange(event.target.value)}
             >
               <option value="">Select Bundesland</option>
 
               {bundeslaender.map((bundesland) => (
-                <option
-                  key={bundesland}
-                  value={bundesland}
-                >
+                <option key={bundesland} value={bundesland}>
                   {bundesland}
                 </option>
               ))}
@@ -131,15 +113,11 @@ function EventFilters({
 
             <select
               value={selectedCity}
-              onChange={(event) =>
-                onCityChange(event.target.value)
-              }
+              onChange={(event) => onCityChange(event.target.value)}
               disabled={!selectedBundesland}
             >
               <option value="">
-                {selectedBundesland
-                  ? 'Select city'
-                  : 'Select Bundesland first'}
+                {selectedBundesland ? "Select city" : "Select Bundesland first"}
               </option>
 
               {availableCities.map((city) => (
@@ -160,9 +138,7 @@ function EventFilters({
             <input
               type="date"
               value={selectedDateFrom}
-              onChange={(event) =>
-                onDateFromChange(event.target.value)
-              }
+              onChange={(event) => onDateFromChange(event.target.value)}
             />
           </label>
 
@@ -172,9 +148,7 @@ function EventFilters({
             <input
               type="date"
               value={selectedDateTo}
-              onChange={(event) =>
-                onDateToChange(event.target.value)
-              }
+              onChange={(event) => onDateToChange(event.target.value)}
             />
           </label>
         </div>
@@ -188,9 +162,7 @@ function EventFilters({
             <select
               value={selectedCategory}
               onChange={(event) =>
-                onCategoryChange(
-                  event.target.value as EventCategory | '',
-                )
+                onCategoryChange(event.target.value as EventCategory | "")
               }
             >
               <option value="">All categories</option>
@@ -209,7 +181,7 @@ function EventFilters({
         </div>
       </div>
     </aside>
-  )
+  );
 }
 
-export default EventFilters
+export default EventFilters;

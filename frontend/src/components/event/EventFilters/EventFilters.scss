@@ -1,5 +1,4 @@
-
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .event-filters {
   position: sticky;
@@ -84,7 +83,7 @@
     }
 
     select,
-    input[type='date'] {
+    input[type="date"] {
       box-sizing: border-box;
       width: 100%;
       min-width: 0;
@@ -241,7 +240,7 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .event-filters {
     background-color: var(--color-surface);
     border-color: var(--color-border);
@@ -262,7 +261,7 @@
       }
 
       select,
-      input[type='date'] {
+      input[type="date"] {
         color: var(--color-text);
         background-color: var(--color-surface-secondary);
         border-color: var(--color-border);

@@ -1,24 +1,21 @@
+import { useState } from "react";
 
-import { useState } from 'react';
+import Container from "../Container/Container";
+import { useAuth } from "../../../context/useAuth";
 
-import Container from '../Container/Container';
-import { useAuth } from '../../../context/useAuth';
-
-import './Header.scss';
+import "./Header.scss";
 
 function Header() {
   const pathname = window.location.pathname;
   const { user, isLoading, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isHomeActive = pathname === '/';
-  const isEventsActive = pathname === '/events';
+  const isHomeActive = pathname === "/";
+  const isEventsActive = pathname === "/events";
 
-  const displayName = user
-    ? `${user.firstName} ${user.lastName}`.trim()
-    : '';
+  const displayName = user ? `${user.firstName} ${user.lastName}`.trim() : "";
 
-  const avatarLetter = user?.firstName?.charAt(0).toUpperCase() || 'G';
+  const avatarLetter = user?.firstName?.charAt(0).toUpperCase() || "G";
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
@@ -28,9 +25,9 @@ function Header() {
     try {
       await logout();
       closeMobileMenu();
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
-      console.error('Failed to log out:', error);
+      console.error("Failed to log out:", error);
     }
   };
 
@@ -44,20 +41,17 @@ function Header() {
             onClick={closeMobileMenu}
             aria-label="UAround — Home"
           >
-            <img
-              src="/images/uaround-logo.png"
-              alt="UAround"
-            />
+            <img src="/images/uaround-logo.png" alt="UAround" />
           </a>
 
           <nav className="header__nav" aria-label="Main navigation">
             <a
               className={[
-                'header__link',
-                isHomeActive && 'header__link--active',
+                "header__link",
+                isHomeActive && "header__link--active",
               ]
                 .filter(Boolean)
-                .join(' ')}
+                .join(" ")}
               href="/"
             >
               Home
@@ -65,11 +59,11 @@ function Header() {
 
             <a
               className={[
-                'header__link',
-                isEventsActive && 'header__link--active',
+                "header__link",
+                isEventsActive && "header__link--active",
               ]
                 .filter(Boolean)
-                .join(' ')}
+                .join(" ")}
               href="/events"
             >
               Events
@@ -102,9 +96,7 @@ function Header() {
                 <span className="header__avatar" aria-hidden="true">
                   {avatarLetter}
                 </span>
-                <span className="header__profile-name">
-                  {displayName}
-                </span>
+                <span className="header__profile-name">{displayName}</span>
                 <span className="header__account-chevron" aria-hidden="true">
                   ⌄
                 </span>
@@ -124,13 +116,13 @@ function Header() {
 
           <button
             className={[
-              'header__menu-toggle',
-              isMobileMenuOpen && 'header__menu-toggle--open',
+              "header__menu-toggle",
+              isMobileMenuOpen && "header__menu-toggle--open",
             ]
               .filter(Boolean)
-              .join(' ')}
+              .join(" ")}
             type="button"
-            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="header-mobile-menu"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
@@ -144,21 +136,21 @@ function Header() {
         <nav
           id="header-mobile-menu"
           className={[
-            'header__mobile-menu',
-            isMobileMenuOpen && 'header__mobile-menu--open',
+            "header__mobile-menu",
+            isMobileMenuOpen && "header__mobile-menu--open",
           ]
             .filter(Boolean)
-            .join(' ')}
+            .join(" ")}
           aria-label="Mobile navigation"
           aria-hidden={!isMobileMenuOpen}
         >
           <a
             className={[
-              'header__mobile-link',
-              isHomeActive && 'header__mobile-link--active',
+              "header__mobile-link",
+              isHomeActive && "header__mobile-link--active",
             ]
               .filter(Boolean)
-              .join(' ')}
+              .join(" ")}
             href="/"
             onClick={closeMobileMenu}
             tabIndex={isMobileMenuOpen ? 0 : -1}
@@ -168,11 +160,11 @@ function Header() {
 
           <a
             className={[
-              'header__mobile-link',
-              isEventsActive && 'header__mobile-link--active',
+              "header__mobile-link",
+              isEventsActive && "header__mobile-link--active",
             ]
               .filter(Boolean)
-              .join(' ')}
+              .join(" ")}
             href="/events"
             onClick={closeMobileMenu}
             tabIndex={isMobileMenuOpen ? 0 : -1}
@@ -194,8 +186,8 @@ function Header() {
             </a>
           )}
 
-          {!isLoading && (
-            user ? (
+          {!isLoading &&
+            (user ? (
               <button
                 className="header__mobile-link header__mobile-logout"
                 type="button"
@@ -213,8 +205,7 @@ function Header() {
               >
                 Log in <span aria-hidden="true">→</span>
               </a>
-            )
-          )}
+            ))}
         </nav>
       </Container>
     </header>

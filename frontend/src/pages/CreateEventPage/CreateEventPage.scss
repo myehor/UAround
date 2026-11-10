@@ -32,7 +32,7 @@
     font-size: 13px;
 
     &::after {
-      content: '';
+      content: "";
 
       position: absolute;
       top: 34px;
@@ -384,8 +384,20 @@
     border-radius: 8px;
 
     background:
-      linear-gradient(35deg, transparent 48%, #d5e2dc 49%, #d5e2dc 51%, transparent 52%),
-      linear-gradient(145deg, transparent 45%, #d8e4dd 46%, #d8e4dd 48%, transparent 49%),
+      linear-gradient(
+        35deg,
+        transparent 48%,
+        #d5e2dc 49%,
+        #d5e2dc 51%,
+        transparent 52%
+      ),
+      linear-gradient(
+        145deg,
+        transparent 45%,
+        #d8e4dd 46%,
+        #d8e4dd 48%,
+        transparent 49%
+      ),
       #eef4ee;
   }
 
@@ -768,7 +780,11 @@
     border-radius: 11px;
 
     background:
-      radial-gradient(circle at 100% 0%, rgba(190, 228, 247, 0.8), transparent 38%),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(190, 228, 247, 0.8),
+        transparent 38%
+      ),
       #eaf6fc;
   }
 
@@ -954,7 +970,7 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .create-event-page {
     background: var(--color-background);
     color: var(--color-text);
@@ -1079,8 +1095,20 @@
     &__map {
       border-color: var(--color-border);
       background:
-        linear-gradient(35deg, transparent 48%, #354b48 49%, #354b48 51%, transparent 52%),
-        linear-gradient(145deg, transparent 45%, #354b48 46%, #354b48 48%, transparent 49%),
+        linear-gradient(
+          35deg,
+          transparent 48%,
+          #354b48 49%,
+          #354b48 51%,
+          transparent 52%
+        ),
+        linear-gradient(
+          145deg,
+          transparent 45%,
+          #354b48 46%,
+          #354b48 48%,
+          transparent 49%
+        ),
         #263b38;
     }
 

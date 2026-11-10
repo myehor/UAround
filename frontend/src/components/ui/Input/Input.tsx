@@ -1,23 +1,23 @@
-import type { ChangeEvent } from 'react'
-import './Input.scss'
+import type { ChangeEvent } from "react";
+import "./Input.scss";
 
 type InputProps = {
-  id: string
-  label: string
-  type?: 'text' | 'email' | 'password'
-  name?: string
-  placeholder?: string
-  value: string
-  required?: boolean
-  disabled?: boolean
-  error?: string
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void
-}
+  id: string;
+  label: string;
+  type?: "text" | "email" | "password";
+  name?: string;
+  placeholder?: string;
+  value: string;
+  required?: boolean;
+  disabled?: boolean;
+  error?: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+};
 
 function Input({
   id,
   label,
-  type = 'text',
+  type = "text",
   name,
   placeholder,
   value,
@@ -35,7 +35,7 @@ function Input({
 
       <input
         id={id}
-        className={`input__field${error ? ' input__field--error' : ''}`}
+        className={`input__field${error ? " input__field--error" : ""}`}
         type={type}
         name={name}
         placeholder={placeholder}
@@ -53,7 +53,7 @@ function Input({
         </p>
       )}
     </div>
-  )
+  );
 }
 
-export default Input
+export default Input;

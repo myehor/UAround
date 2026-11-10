@@ -1,76 +1,67 @@
-
 import {
   useEffect,
   useState,
   type KeyboardEvent,
   type MouseEvent,
-} from 'react'
+} from "react";
 
-import { getEvents } from '../../../api/events'
-import type { Event } from '../../../types/event'
+import { getEvents } from "../../../api/events";
+import type { Event } from "../../../types/event";
 
-import './BundeslandEvents.scss'
+import "./BundeslandEvents.scss";
 
 function BundeslandEvents() {
-  const [events, setEvents] = useState<Event[]>([])
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     const loadEvents = async () => {
       try {
-        const data = await getEvents()
+        const data = await getEvents();
 
         if (isActive) {
-          setEvents(data)
+          setEvents(data);
         }
       } catch (error) {
-        console.error('Failed to load Bundesland events:', error)
+        console.error("Failed to load Bundesland events:", error);
       }
-    }
+    };
 
-    void loadEvents()
+    void loadEvents();
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
   const bundeslandEvents = events
-    .filter((event) => event.bundesland === 'Bayern')
-    .slice(0, 3)
+    .filter((event) => event.bundesland === "Bayern")
+    .slice(0, 3);
 
   const handleCardClick = (eventId: string) => {
-    window.location.assign(`/events/${eventId}`)
-  }
+    window.location.assign(`/events/${eventId}`);
+  };
 
   const handleCardKeyDown = (
     keyboardEvent: KeyboardEvent<HTMLElement>,
     eventId: string,
   ) => {
-    if (
-      keyboardEvent.key === 'Enter' ||
-      keyboardEvent.key === ' '
-    ) {
-      keyboardEvent.preventDefault()
-      handleCardClick(eventId)
+    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+      keyboardEvent.preventDefault();
+      handleCardClick(eventId);
     }
-  }
+  };
 
-  const handleRegisterClick = (
-    event: MouseEvent<HTMLButtonElement>,
-  ) => {
-    event.stopPropagation()
-  }
+  const handleRegisterClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
 
   return (
     <section className="bundesland-events">
       <div className="bundesland-events__header">
         <div className="bundesland-events__heading">
-          <span
-            className="bundesland-events__icon"
-            aria-hidden="true"
-          >
+          <span className="bundesland-events__icon" aria-hidden="true">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -126,10 +117,7 @@ function BundeslandEvents() {
             tabIndex={0}
           >
             <div className="bundesland-events__image">
-              <img
-                src={event.imageUrl}
-                alt=""
-              />
+              <img src={event.imageUrl} alt="" />
             </div>
 
             <div className="bundesland-events__content">
@@ -137,9 +125,7 @@ function BundeslandEvents() {
                 {event.category}
               </span>
 
-              <h3 className="bundesland-events__event-title">
-                {event.title}
-              </h3>
+              <h3 className="bundesland-events__event-title">{event.title}</h3>
 
               <div className="bundesland-events__info">
                 <p>
@@ -157,9 +143,7 @@ function BundeslandEvents() {
                     <span>O</span>
                   </div>
 
-                  <span>
-                    {event.registeredCount} going
-                  </span>
+                  <span>{event.registeredCount} going</span>
                 </div>
 
                 <button
@@ -175,7 +159,7 @@ function BundeslandEvents() {
         ))}
       </div>
     </section>
-  )
+  );
 }
 
-export default BundeslandEvents
+export default BundeslandEvents;

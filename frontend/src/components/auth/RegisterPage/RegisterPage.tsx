@@ -1,52 +1,52 @@
-import { useState, type FormEvent } from 'react'
-import AuthLayout from '../../../components/auth/AuthLayout/AuthLayout'
-import { registerUser } from '../../../api/auth'
-import { bundeslaender, getCities } from '../../../data/locations'
-import './RegisterPage.scss'
+import { useState, type FormEvent } from "react";
+import AuthLayout from "../../../components/auth/AuthLayout/AuthLayout";
+import { registerUser } from "../../../api/auth";
+import { bundeslaender, getCities } from "../../../data/locations";
+import "./RegisterPage.scss";
 
 function RegisterPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [selectedBundesland, setSelectedBundesland] = useState('Bayern')
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedBundesland, setSelectedBundesland] = useState("Bayern");
 
-  const availableCities = getCities(selectedBundesland)
+  const availableCities = getCities(selectedBundesland);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setError('')
-    setIsSubmitting(true)
+    event.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    const formData = new FormData(event.currentTarget)
+    const formData = new FormData(event.currentTarget);
 
-    const password = String(formData.get('password') ?? '')
-    const email = String(formData.get('email') ?? '').trim()
+    const password = String(formData.get("password") ?? "");
+    const email = String(formData.get("email") ?? "").trim();
 
     if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
-      setError('Password must contain at least one letter and one number.')
-      setIsSubmitting(false)
-      return
+      setError("Password must contain at least one letter and one number.");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
       await registerUser({
-        firstName: String(formData.get('firstName') ?? '').trim(),
-        lastName: String(formData.get('lastName') ?? '').trim(),
+        firstName: String(formData.get("firstName") ?? "").trim(),
+        lastName: String(formData.get("lastName") ?? "").trim(),
         email,
         password,
-        bundesland: String(formData.get('bundesland') ?? ''),
-        city: String(formData.get('city') ?? ''),
-      })
+        bundesland: String(formData.get("bundesland") ?? ""),
+        city: String(formData.get("city") ?? ""),
+      });
 
-      window.location.assign('/')
+      window.location.assign("/");
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : 'Registration failed. Please try again.',
-      )
+          : "Registration failed. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -58,16 +58,15 @@ function RegisterPage() {
       <div className="register-page">
         <div className="register-page__header">
           <h2>Create an account</h2>
-          <p>
-            Join UAround and start exploring events
-            in your city.
-          </p>
+          <p>Join UAround and start exploring events in your city.</p>
         </div>
 
         <form className="register-page__form" onSubmit={handleSubmit}>
           <div className="register-page__row">
             <label className="register-page__field">
-              <span>First name <strong>*</strong></span>
+              <span>
+                First name <strong>*</strong>
+              </span>
               <input
                 type="text"
                 name="firstName"
@@ -79,7 +78,9 @@ function RegisterPage() {
             </label>
 
             <label className="register-page__field">
-              <span>Last name <strong>*</strong></span>
+              <span>
+                Last name <strong>*</strong>
+              </span>
               <input
                 type="text"
                 name="lastName"
@@ -92,7 +93,9 @@ function RegisterPage() {
           </div>
 
           <label className="register-page__field">
-            <span>Email <strong>*</strong></span>
+            <span>
+              Email <strong>*</strong>
+            </span>
             <input
               type="email"
               name="email"
@@ -111,7 +114,7 @@ function RegisterPage() {
             <div className="register-page__password">
               <input
                 id="register-password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 autoComplete="new-password"
@@ -124,9 +127,9 @@ function RegisterPage() {
                 type="button"
                 className="register-page__password-toggle"
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? '◉' : '◌'}
+                {showPassword ? "◉" : "◌"}
               </button>
             </div>
 
@@ -140,12 +143,14 @@ function RegisterPage() {
 
             <div className="register-page__row">
               <label className="register-page__field">
-                <span>Bundesland <strong>*</strong></span>
+                <span>
+                  Bundesland <strong>*</strong>
+                </span>
                 <select
                   name="bundesland"
                   value={selectedBundesland}
                   onChange={(event) => {
-                    setSelectedBundesland(event.target.value)
+                    setSelectedBundesland(event.target.value);
                   }}
                   required
                 >
@@ -158,11 +163,13 @@ function RegisterPage() {
               </label>
 
               <label className="register-page__field">
-                <span>City <strong>*</strong></span>
+                <span>
+                  City <strong>*</strong>
+                </span>
                 <select
                   key={selectedBundesland}
                   name="city"
-                  defaultValue={availableCities[0] ?? ''}
+                  defaultValue={availableCities[0] ?? ""}
                   required
                   disabled={availableCities.length === 0}
                 >
@@ -187,17 +194,16 @@ function RegisterPage() {
             className="register-page__submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Creating account...' : 'Create Account'}
+            {isSubmitting ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
         <p className="register-page__login">
-          Already have an account?{' '}
-          <a href="/login">Log in</a>
+          Already have an account? <a href="/login">Log in</a>
         </p>
       </div>
     </AuthLayout>
-  )
+  );
 }
 
-export default RegisterPage
+export default RegisterPage;

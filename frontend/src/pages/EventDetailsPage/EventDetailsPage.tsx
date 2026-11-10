@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from "react";
 
 import {
   getEvents,
@@ -8,122 +8,124 @@ import {
   getEventParticipants,
   deleteEvent,
   type EventParticipant,
-} from '../../api/events'
-import type { Event } from '../../types/event'
-import { useAuth } from '../../context/useAuth'
+} from "../../api/events";
+import type { Event } from "../../types/event";
+import { useAuth } from "../../context/useAuth";
 
-import './EventDetailsPage.scss'
+import "./EventDetailsPage.scss";
 
 type EventDetailsPageProps = {
-  eventId: string
-}
+  eventId: string;
+};
 
 function EventDetailsPage({ eventId }: EventDetailsPageProps) {
-  const [events, setEvents] = useState<Event[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [participants, setParticipants] = useState<EventParticipant[]>([])
-  const { user } = useAuth()
-  const [isRegistered, setIsRegistered] = useState(false)
-  const [isRegistrationLoading, setIsRegistrationLoading] = useState(false)
-  const [registrationError, setRegistrationError] = useState<string | null>(null)
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [participants, setParticipants] = useState<EventParticipant[]>([]);
+  const { user } = useAuth();
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [isRegistrationLoading, setIsRegistrationLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(
+    null,
+  );
 
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     const loadEvents = async () => {
       try {
-        setError(null)
+        setError(null);
 
-        const data = await getEvents()
+        const data = await getEvents();
 
         if (isActive) {
-          setEvents(data)
+          setEvents(data);
         }
       } catch {
         if (isActive) {
-          setError('Failed to load event details. Please try again later.')
+          setError("Failed to load event details. Please try again later.");
         }
       } finally {
         if (isActive) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
-    }
+    };
 
-    void loadEvents()
+    void loadEvents();
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
-    useEffect(() => {
-    let isActive = true
+  useEffect(() => {
+    let isActive = true;
 
     const loadRegistrationStatus = async () => {
-      setIsRegistered(false)
-      setRegistrationError(null)
+      setIsRegistered(false);
+      setRegistrationError(null);
 
       if (!user || !eventId) {
-        return
+        return;
       }
 
       try {
-        const result = await getEventRegistrationStatus(eventId)
+        const result = await getEventRegistrationStatus(eventId);
 
         if (isActive) {
-          setIsRegistered(result.isRegistered)
+          setIsRegistered(result.isRegistered);
         }
       } catch (error) {
         if (isActive) {
           setRegistrationError(
             error instanceof Error
               ? error.message
-              : 'Failed to load registration status.',
-          )
+              : "Failed to load registration status.",
+          );
         }
       }
-    }
+    };
 
-    void loadRegistrationStatus()
+    void loadRegistrationStatus();
 
     return () => {
-      isActive = false
-    }
-  }, [eventId, user])
+      isActive = false;
+    };
+  }, [eventId, user]);
 
   const event = useMemo(
     () => events.find((item) => item.id === eventId),
     [events, eventId],
-  )
-  
+  );
+
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     const loadParticipants = async () => {
       try {
-        const data = await getEventParticipants(eventId)
+        const data = await getEventParticipants(eventId);
 
         if (isActive) {
-          setParticipants(data)
+          setParticipants(data);
         }
       } catch (error) {
-        console.error('Failed to load event participants:', error)
+        console.error("Failed to load event participants:", error);
       }
-    }
+    };
 
-    void loadParticipants()
+    void loadParticipants();
 
     return () => {
-      isActive = false
-    }
-  }, [eventId])
+      isActive = false;
+    };
+  }, [eventId]);
 
-  const [shareMessage, setShareMessage] = useState('')
+  const [shareMessage, setShareMessage] = useState("");
 
   if (isLoading) {
     return (
@@ -132,7 +134,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <p role="status">Loading event details...</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (error) {
@@ -143,7 +145,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <a href="/events">← Back to Events</a>
         </div>
       </main>
-    )
+    );
   }
 
   if (!event) {
@@ -159,155 +161,144 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <a href="/events">← Back to Events</a>
         </div>
       </main>
-    )
+    );
   }
 
-
   const isOrganizer =
-    user?.id === event.creatorId || user?.id === event.createdBy?.id
+    user?.id === event.creatorId || user?.id === event.createdBy?.id;
 
-  
   const handleRegistration = async () => {
     if (isOrganizer || isRegistrationLoading) {
-      return
+      return;
     }
 
-    setIsRegistrationLoading(true)
-    setRegistrationError(null)
+    setIsRegistrationLoading(true);
+    setRegistrationError(null);
 
     try {
       if (isRegistered) {
-        await cancelEventRegistration(event.id)
-        setIsRegistered(false)
+        await cancelEventRegistration(event.id);
+        setIsRegistered(false);
       } else {
-        await registerForEvent(event.id)
-        setIsRegistered(true)
+        await registerForEvent(event.id);
+        setIsRegistered(true);
       }
 
       try {
-        const updatedEvents = await getEvents()
-        setEvents(updatedEvents)
+        const updatedEvents = await getEvents();
+        setEvents(updatedEvents);
       } catch {
         setRegistrationError(
-          'Registration was updated, but the participant count could not be refreshed. Please reload the page.',
-        )
+          "Registration was updated, but the participant count could not be refreshed. Please reload the page.",
+        );
       }
     } catch (error) {
       setRegistrationError(
         error instanceof Error
           ? error.message
-          : 'Failed to update registration.',
-      )
+          : "Failed to update registration.",
+      );
     } finally {
-      setIsRegistrationLoading(false)
+      setIsRegistrationLoading(false);
     }
-  }
+  };
 
   const handleDeleteEvent = async () => {
     const confirmed = window.confirm(
-      'Are you sure you want to delete this event? This action cannot be undone.',
-    )
+      "Are you sure you want to delete this event? This action cannot be undone.",
+    );
 
     if (!confirmed) {
-      return
+      return;
     }
 
-    setIsDeleting(true)
-    setDeleteError(null)
+    setIsDeleting(true);
+    setDeleteError(null);
 
     try {
-      await deleteEvent(event.id)
-      window.location.href = '/events'
+      await deleteEvent(event.id);
+      window.location.href = "/events";
     } catch (error) {
       setDeleteError(
-        error instanceof Error
-          ? error.message
-          : 'Failed to delete event.',
-      )
+        error instanceof Error ? error.message : "Failed to delete event.",
+      );
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
-
-  const visibleParticipants = participants.slice(0, 8)
+  const visibleParticipants = participants.slice(0, 8);
 
   const extraParticipants = Math.max(
     participants.length - visibleParticipants.length,
     0,
-  )
+  );
 
   const organizerEvents = events
     .filter(
-      (item) =>
-        item.id !== event.id &&
-        item.creatorId === event.creatorId,
+      (item) => item.id !== event.id && item.creatorId === event.creatorId,
     )
-    .slice(0, 3)
+    .slice(0, 3);
 
   const similarEvents = events
-    .filter(
-      (item) =>
-        item.id !== event.id &&
-        item.category === event.category,
-    )
-    .slice(0, 3)
+    .filter((item) => item.id !== event.id && item.category === event.category)
+    .slice(0, 3);
 
   const eventLocation = [
     event.venue,
     event.address,
     event.city,
     event.bundesland,
-    'Germany',
+    "Germany",
   ]
     .filter(Boolean)
-    .join(', ')
+    .join(", ");
 
   const googleMapsSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     eventLocation,
-  )}`
+  )}`;
 
   const googleMapsEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(
     eventLocation,
-  )}&output=embed`
+  )}&output=embed`;
 
   const handleShare = async () => {
     const shareData = {
       title: event.title,
       text: event.description,
       url: window.location.href,
-    }
+    };
 
-    if (navigator.share && typeof navigator.share === 'function') {
+    if (navigator.share && typeof navigator.share === "function") {
       try {
-        await navigator.share(shareData)
-        return
+        await navigator.share(shareData);
+        return;
       } catch {
-        return
+        return;
       }
     }
 
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(window.location.href);
 
-      setShareMessage('Link copied!')
+      setShareMessage("Link copied!");
 
       window.setTimeout(() => {
-        setShareMessage('')
-      }, 2000)
+        setShareMessage("");
+      }, 2000);
     } catch {
-      setShareMessage('Copy the link from your browser.')
+      setShareMessage("Copy the link from your browser.");
 
       window.setTimeout(() => {
-        setShareMessage('')
-      }, 2500)
+        setShareMessage("");
+      }, 2500);
     }
-  }
+  };
 
   const backUrl =
-    new URLSearchParams(window.location.search).get('from') === 'profile'
-      ? '/profile#my-events'
-      : '/events'
+    new URLSearchParams(window.location.search).get("from") === "profile"
+      ? "/profile#my-events"
+      : "/events";
 
   return (
     <main className="event-details-page">
@@ -351,7 +342,6 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                 strokeLinecap="round"
               />
             </svg>
-
             Share
           </button>
 
@@ -364,13 +354,9 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
 
         <div className="event-details-page__upper-grid">
           <div className="event-details-page__primary">
-
             <div className="event-details-page__media">
               <div className="event-details-page__hero">
-                <img
-                  src={event.imageUrl}
-                  alt={event.title}
-                />
+                <img src={event.imageUrl} alt={event.title} />
               </div>
             </div>
 
@@ -392,7 +378,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                   <strong>{event.date}</strong>
                   <span>
                     {event.startTime}
-                    {event.endTime ? ` – ${event.endTime}` : ''}
+                    {event.endTime ? ` – ${event.endTime}` : ""}
                   </span>
                 </div>
               </div>
@@ -414,7 +400,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                   <span>
                     {event.participantLimit
                       ? `${event.participantLimit} spots`
-                      : 'No limit'}
+                      : "No limit"}
                   </span>
                 </div>
               </div>
@@ -437,9 +423,9 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
 
                 <p>
                   This is a great opportunity to meet new people, stay active,
-                  and spend time together with the Ukrainian community.
-                  Everyone is welcome, whether you are new in the city or
-                  already know the local community.
+                  and spend time together with the Ukrainian community. Everyone
+                  is welcome, whether you are new in the city or already know
+                  the local community.
                 </p>
 
                 <p>
@@ -578,25 +564,22 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <aside className="event-details-page__sidebar">
             <div className="event-details-page__registration">
               {isOrganizer ? (
+                <div className="event-details-page__organizer-actions">
+                  <div className="event-details-page__register">
+                    You’re the organizer of this event.
+                  </div>
 
-              <div className="event-details-page__organizer-actions">
-                <div className="event-details-page__register">
-                  You’re the organizer of this event.
+                  <button
+                    type="button"
+                    className="event-details-page__delete-event"
+                    onClick={handleDeleteEvent}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete event"}
+                  </button>
+
+                  {deleteError && <p role="alert">{deleteError}</p>}
                 </div>
-
-                <button
-                  type="button"
-                  className="event-details-page__delete-event"
-                  onClick={handleDeleteEvent}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete event'}
-                </button>
-
-                {deleteError && (
-                  <p role="alert">{deleteError}</p>
-                )}
-              </div>
               ) : (
                 <>
                   {!isRegistered && (
@@ -606,7 +589,9 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                       onClick={handleRegistration}
                       disabled={isRegistrationLoading}
                     >
-                      {isRegistrationLoading ? 'Please wait...' : 'Register for this event'}
+                      {isRegistrationLoading
+                        ? "Please wait..."
+                        : "Register for this event"}
                     </button>
                   )}
 
@@ -616,12 +601,16 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                       <p className="event-details-page__registration-subtitle">
                         Your registration is confirmed.
                       </p>
-                      <p className="event-details-page__registration-thanks" role="status">
-                        Thanks for joining us! We look forward to seeing you at the event.
+                      <p
+                        className="event-details-page__registration-thanks"
+                        role="status"
+                      >
+                        Thanks for joining us! We look forward to seeing you at
+                        the event.
                       </p>
                       <p className="event-details-page__registration-hint">
-                        Plans changed? You can cancel your registration below so someone
-                        else can take your spot.
+                        Plans changed? You can cancel your registration below so
+                        someone else can take your spot.
                       </p>
 
                       <button
@@ -630,14 +619,14 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                         onClick={handleRegistration}
                         disabled={isRegistrationLoading}
                       >
-                        {isRegistrationLoading ? 'Cancelling...' : 'Cancel registration'}
+                        {isRegistrationLoading
+                          ? "Cancelling..."
+                          : "Cancel registration"}
                       </button>
                     </div>
                   )}
 
-                  {registrationError && (
-                    <p role="alert">{registrationError}</p>
-                  )}
+                  {registrationError && <p role="alert">{registrationError}</p>}
                 </>
               )}
             </div>
@@ -645,33 +634,31 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
             <div className="event-details-page__organizer-card">
               <h2>Organizer</h2>
 
+              <div className="event-details-page__organizer-profile">
+                <div className="event-details-page__organizer-avatar">
+                  {event.createdBy?.avatarUrl ? (
+                    <img
+                      src={event.createdBy.avatarUrl}
+                      alt={`${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()}
+                    />
+                  ) : (
+                    <span>
+                      {event.createdBy
+                        ? `${event.createdBy.firstName.charAt(0)}${event.createdBy.lastName.charAt(0)}`.toUpperCase()
+                        : "?"}
+                    </span>
+                  )}
+                </div>
 
-            <div className="event-details-page__organizer-profile">
-              <div className="event-details-page__organizer-avatar">
-                {event.createdBy?.avatarUrl ? (
-                  <img
-                    src={event.createdBy.avatarUrl}
-                    alt={`${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()}
-                  />
-                ) : (
-                  <span>
+                <div>
+                  <strong>
                     {event.createdBy
-                      ? `${event.createdBy.firstName.charAt(0)}${event.createdBy.lastName.charAt(0)}`.toUpperCase()
-                      : '?'}
-                  </span>
-                )}
+                      ? `${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()
+                      : "Unknown organizer"}
+                  </strong>
+                  <span>Community member</span>
+                </div>
               </div>
-
-              <div>
-                <strong>
-                  {event.createdBy
-                    ? `${event.createdBy.firstName} ${event.createdBy.lastName}`.trim()
-                    : 'Unknown organizer'}
-                </strong>
-                <span>Community member</span>
-              </div>
-            </div>
-
 
               <button
                 type="button"
@@ -694,10 +681,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                       href={`/events/${organizerEvent.id}`}
                       className="event-details-page__organizer-event"
                     >
-                      <img
-                        src={organizerEvent.imageUrl}
-                        alt=""
-                      />
+                      <img src={organizerEvent.imageUrl} alt="" />
 
                       <div>
                         <strong>{organizerEvent.title}</strong>
@@ -741,7 +725,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
           <div className="event-details-page__participants-row">
             {visibleParticipants.map((participant) => {
               const fullName =
-                `${participant.firstName} ${participant.lastName}`.trim()
+                `${participant.firstName} ${participant.lastName}`.trim();
 
               return (
                 <div
@@ -755,7 +739,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                     `${participant.firstName.charAt(0)}${participant.lastName.charAt(0)}`.toUpperCase()
                   )}
                 </div>
-              )
+              );
             })}
 
             {extraParticipants > 0 && (
@@ -780,17 +764,17 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                   key={similarEvent.id}
                   className="event-details-page__similar-card"
                   onClick={() => {
-                    window.location.href = `/events/${similarEvent.id}`
+                    window.location.href = `/events/${similarEvent.id}`;
                   }}
                   role="link"
                   tabIndex={0}
                   onKeyDown={(keyboardEvent) => {
                     if (
-                      keyboardEvent.key === 'Enter' ||
-                      keyboardEvent.key === ' '
+                      keyboardEvent.key === "Enter" ||
+                      keyboardEvent.key === " "
                     ) {
-                      keyboardEvent.preventDefault()
-                      window.location.href = `/events/${similarEvent.id}`
+                      keyboardEvent.preventDefault();
+                      window.location.href = `/events/${similarEvent.id}`;
                     }
                   }}
                 >
@@ -827,7 +811,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
                       <button
                         type="button"
                         onClick={(clickEvent) => {
-                          clickEvent.stopPropagation()
+                          clickEvent.stopPropagation();
                         }}
                       >
                         Register
@@ -845,7 +829,7 @@ function EventDetailsPage({ eventId }: EventDetailsPageProps) {
         </section>
       </div>
     </main>
-  )
+  );
 }
 
-export default EventDetailsPage
+export default EventDetailsPage;

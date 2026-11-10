@@ -1,4 +1,4 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .community-action {
   position: relative;
@@ -14,12 +14,7 @@
       rgba(255, 255, 255, 0.9),
       transparent 42%
     ),
-    linear-gradient(
-      120deg,
-      #eaf6fc 0%,
-      #e4f2fb 55%,
-      #d9edf9 100%
-    );
+    linear-gradient(120deg, #eaf6fc 0%, #e4f2fb 55%, #d9edf9 100%);
   border-radius: $radius-lg;
 }
 

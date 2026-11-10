@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react'
-import { useAuth } from '../../context/useAuth'
-import './WelcomePage.scss'
+import { useEffect, useState } from "react";
+import { useAuth } from "../../context/useAuth";
+import "./WelcomePage.scss";
 
 function WelcomePage() {
-  const { logout } = useAuth()
-  const [showIntro, setShowIntro] = useState(true)
-  const [introLeaving, setIntroLeaving] = useState(false)
+  const { logout } = useAuth();
+  const [showIntro, setShowIntro] = useState(true);
+  const [introLeaving, setIntroLeaving] = useState(false);
 
   useEffect(() => {
     const leaveTimer = window.setTimeout(() => {
-      setIntroLeaving(true)
-    }, 5200)
+      setIntroLeaving(true);
+    }, 5200);
 
     const hideTimer = window.setTimeout(() => {
-      setShowIntro(false)
-    }, 6000)
+      setShowIntro(false);
+    }, 6000);
 
     return () => {
-      window.clearTimeout(leaveTimer)
-      window.clearTimeout(hideTimer)
-    }
-  }, [])
+      window.clearTimeout(leaveTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, []);
 
   return (
     <main className="welcome-page">
       {showIntro && (
         <div
           className={`welcome-intro ${
-            introLeaving ? 'welcome-intro--leaving' : ''
+            introLeaving ? "welcome-intro--leaving" : ""
           }`}
           aria-label="Welcome to UAround"
         >
@@ -38,10 +38,7 @@ function WelcomePage() {
           </div>
 
           <div className="welcome-intro__content">
-            <img
-              src="/images/uaround-logo.png"
-              alt="UAround"
-            />
+            <img src="/images/uaround-logo.png" alt="UAround" />
 
             <h1>Welcome to UAround</h1>
             <p>Your community. Your events.</p>
@@ -53,15 +50,10 @@ function WelcomePage() {
         </div>
       )}
 
-      
-
       <div className="welcome-page__container">
         <header className="welcome-page__header">
           <a href="/" aria-label="UAround home">
-            <img
-              src="/images/uaround-logo.png"
-              alt="UAround"
-            />
+            <img src="/images/uaround-logo.png" alt="UAround" />
           </a>
         </header>
 
@@ -80,8 +72,8 @@ function WelcomePage() {
             </h1>
 
             <p className="welcome-page__description">
-              Discover Ukrainian events, meet new people
-              and find your community across Germany.
+              Discover Ukrainian events, meet new people and find your community
+              across Germany.
             </p>
 
             <div className="welcome-page__actions">
@@ -97,13 +89,13 @@ function WelcomePage() {
                 href="/home"
                 className="welcome-page__button welcome-page__button--secondary"
                 onClick={async (event) => {
-                  event.preventDefault()
+                  event.preventDefault();
 
                   try {
-                    await logout()
-                    window.location.assign('/home')
+                    await logout();
+                    window.location.assign("/home");
                   } catch (error) {
-                    console.error('Failed to log out:', error)
+                    console.error("Failed to log out:", error);
                   }
                 }}
               >
@@ -166,7 +158,6 @@ function WelcomePage() {
               </span>
             </div>
           </div>
-
         </section>
 
         <footer className="welcome-page__footer">
@@ -175,7 +166,7 @@ function WelcomePage() {
         </footer>
       </div>
     </main>
-  )
+  );
 }
 
-export default WelcomePage
+export default WelcomePage;

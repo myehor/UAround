@@ -1,13 +1,12 @@
+import "dotenv/config";
 
-import 'dotenv/config';
-
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../generated/prisma/client.js';
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../../generated/prisma/client.js";
 
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL is not configured in the .env file');
+  throw new Error("DATABASE_URL is not configured in the .env file");
 }
 
 const adapter = new PrismaPg({ connectionString });

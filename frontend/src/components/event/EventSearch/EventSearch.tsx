@@ -1,35 +1,28 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import './EventSearch.scss'
+import "./EventSearch.scss";
 
 type EventSearchProps = {
-  onSearch: (query: string) => void
-}
+  onSearch: (query: string) => void;
+};
 
-function EventSearch({
-  onSearch,
-}: EventSearchProps) {
-  const [query, setQuery] = useState('')
+function EventSearch({ onSearch }: EventSearchProps) {
+  const [query, setQuery] = useState("");
 
   const handleSearch = () => {
-    onSearch(query.trim())
-  }
+    onSearch(query.trim());
+  };
 
-  const handleKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
-    if (event.key === 'Enter') {
-      handleSearch()
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
     }
-  }
+  };
 
   return (
     <div className="event-search">
       <div className="event-search__field">
-        <span
-          className="event-search__icon"
-          aria-hidden="true"
-        >
+        <span className="event-search__icon" aria-hidden="true">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -55,9 +48,7 @@ function EventSearch({
         <input
           type="search"
           value={query}
-          onChange={(event) =>
-            setQuery(event.target.value)
-          }
+          onChange={(event) => setQuery(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Search events (e.g. yoga, language exchange, football...)"
           aria-label="Search events"
@@ -72,7 +63,7 @@ function EventSearch({
         Search
       </button>
     </div>
-  )
+  );
 }
 
-export default EventSearch
+export default EventSearch;

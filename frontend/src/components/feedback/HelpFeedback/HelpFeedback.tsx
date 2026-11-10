@@ -1,71 +1,69 @@
+import { useEffect, useState } from "react";
+import "./HelpFeedback.scss";
 
-import { useEffect, useState } from 'react'
-import './HelpFeedback.scss'
-
-type FeedbackType = 'problem' | 'idea' | 'question'
+type FeedbackType = "problem" | "idea" | "question";
 
 const feedbackOptions = [
   {
-    type: 'problem' as const,
-    icon: '🐛',
-    title: 'Report a problem',
+    type: "problem" as const,
+    icon: "🐛",
+    title: "Report a problem",
     description: "Something isn't working as expected.",
   },
   {
-    type: 'idea' as const,
-    icon: '💡',
-    title: 'Suggest an idea',
-    description: 'Tell us how we can improve UAround.',
+    type: "idea" as const,
+    icon: "💡",
+    title: "Suggest an idea",
+    description: "Tell us how we can improve UAround.",
   },
   {
-    type: 'question' as const,
-    icon: '💬',
-    title: 'Ask a question',
-    description: 'Need help with an event or your account?',
+    type: "question" as const,
+    icon: "💬",
+    title: "Ask a question",
+    description: "Need help with an event or your account?",
   },
-]
+];
 
 const feedbackTitles: Record<FeedbackType, string> = {
-  problem: 'Report a problem',
-  idea: 'Suggest an idea',
-  question: 'Ask a question',
-}
+  problem: "Report a problem",
+  idea: "Suggest an idea",
+  question: "Ask a question",
+};
 
 function HelpFeedback() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [selectedType, setSelectedType] =
-    useState<FeedbackType | null>(null)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [subject, setSubject] = useState('')
-  const [message, setMessage] = useState('')
-  const [email, setEmail] = useState('')
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<FeedbackType | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false)
+      if (event.key === "Escape") {
+        setIsOpen(false);
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   const closePanel = () => {
-    setIsOpen(false)
-    setSelectedType(null)
-    setIsSubmitted(false)
-    setSubject('')
-    setMessage('')
-    setEmail('')
-  }
+    setIsOpen(false);
+    setSelectedType(null);
+    setIsSubmitted(false);
+    setSubject("");
+    setMessage("");
+    setEmail("");
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsSubmitted(true)
-  }
+    event.preventDefault();
+    setIsSubmitted(true);
+  };
 
   return (
     <>
@@ -93,7 +91,7 @@ function HelpFeedback() {
         <div
           className="help-feedback__overlay"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closePanel()
+            if (event.target === event.currentTarget) closePanel();
           }}
         >
           <section
@@ -245,7 +243,7 @@ function HelpFeedback() {
         </div>
       )}
     </>
-  )
+  );
 }
 
-export default HelpFeedback
+export default HelpFeedback;

@@ -1,16 +1,10 @@
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .footer {
   position: relative;
   margin-top: 48px;
   overflow: hidden;
-  background:
-    linear-gradient(
-      135deg,
-      #fafdff 0%,
-      #eef8fd 45%,
-      #fafdff 100%
-    );
+  background: linear-gradient(135deg, #fafdff 0%, #eef8fd 45%, #fafdff 100%);
 }
 
 /*
@@ -36,7 +30,7 @@
   background: rgba(215, 239, 251, 0.78);
   border-radius: 50%;
   transform: rotate(-3deg);
-  content: '';
+  content: "";
 }
 
 .footer__waves::after {
@@ -48,7 +42,7 @@
   background: rgba(239, 248, 253, 0.94);
   border-radius: 50%;
   transform: rotate(3deg);
-  content: '';
+  content: "";
 }
 
 /*
@@ -274,14 +268,9 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .footer {
-    background: linear-gradient(
-      135deg,
-      #142330 0%,
-      #172a3a 50%,
-      #142330 100%
-    );
+    background: linear-gradient(135deg, #142330 0%, #172a3a 50%, #142330 100%);
   }
 
   .footer__waves::before {

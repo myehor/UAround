@@ -1,29 +1,33 @@
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
 
-import { Router } from 'express';
-import bcrypt from 'bcryptjs';
-import { z } from 'zod';
-
-import { prisma } from './lib/prisma.js';
+import { prisma } from "./lib/prisma.js";
 
 const router = Router();
 
 const registerSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
-  email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
+  email: z
+    .string()
+    .trim()
+    .email()
+    .max(254)
+    .transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(72),
   bundesland: z.string().trim().min(1).max(100),
   city: z.string().trim().min(1).max(100),
 });
 
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   const validation = registerSchema.safeParse(req.body);
 
   if (!validation.success) {
     res.status(400).json({
-      message: 'Please check the registration data.',
+      message: "Please check the registration data.",
       errors: validation.error.issues.map((issue) => ({
-        field: issue.path.join('.'),
+        field: issue.path.join("."),
         message: issue.message,
       })),
     });
@@ -59,8 +63,8 @@ router.post('/register', async (req, res) => {
 
     req.session.regenerate((sessionError) => {
       if (sessionError) {
-        console.error('Failed to regenerate session:', sessionError);
-        res.status(500).json({ message: 'Failed to create a session.' });
+        console.error("Failed to regenerate session:", sessionError);
+        res.status(500).json({ message: "Failed to create a session." });
         return;
       }
 
@@ -68,49 +72,53 @@ router.post('/register', async (req, res) => {
 
       req.session.save((saveError) => {
         if (saveError) {
-          console.error('Failed to save session:', saveError);
-          res.status(500).json({ message: 'Failed to create a session.' });
+          console.error("Failed to save session:", saveError);
+          res.status(500).json({ message: "Failed to create a session." });
           return;
         }
 
         res.status(201).json({
-          message: 'Account created successfully.',
+          message: "Account created successfully.",
           user,
         });
       });
     });
   } catch (error: unknown) {
     if (
-      typeof error === 'object' &&
+      typeof error === "object" &&
       error !== null &&
-      'code' in error &&
-      error.code === 'P2002'
+      "code" in error &&
+      error.code === "P2002"
     ) {
       res.status(409).json({
-        message: 'An account with this email already exists.',
+        message: "An account with this email already exists.",
       });
       return;
     }
 
-    console.error('Registration failed:', error);
+    console.error("Registration failed:", error);
 
     res.status(500).json({
-      message: 'Registration failed. Please try again later.',
+      message: "Registration failed. Please try again later.",
     });
   }
 });
 
-
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   const loginSchema = z.object({
-    email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
+    email: z
+      .string()
+      .trim()
+      .email()
+      .max(254)
+      .transform((value) => value.toLowerCase()),
     password: z.string().min(1).max(72),
   });
 
   const validation = loginSchema.safeParse(req.body);
 
   if (!validation.success) {
-    res.status(400).json({ message: 'Invalid email or password.' });
+    res.status(400).json({ message: "Invalid email or password." });
     return;
   }
 
@@ -122,17 +130,14 @@ router.post('/login', async (req, res) => {
     });
 
     if (!user) {
-      res.status(401).json({ message: 'Invalid email or password.' });
+      res.status(401).json({ message: "Invalid email or password." });
       return;
     }
 
-    const passwordMatches = await bcrypt.compare(
-      password,
-      user.passwordHash,
-    );
+    const passwordMatches = await bcrypt.compare(password, user.passwordHash);
 
     if (!passwordMatches) {
-      res.status(401).json({ message: 'Invalid email or password.' });
+      res.status(401).json({ message: "Invalid email or password." });
       return;
     }
 
@@ -153,7 +158,7 @@ router.post('/login', async (req, res) => {
     });
 
     res.json({
-      message: 'Logged in successfully.',
+      message: "Logged in successfully.",
       user: {
         id: user.id,
         firstName: user.firstName,
@@ -166,15 +171,14 @@ router.post('/login', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Login failed:', error);
-    res.status(500).json({ message: 'Login failed. Please try again later.' });
+    console.error("Login failed:", error);
+    res.status(500).json({ message: "Login failed. Please try again later." });
   }
 });
 
-
-router.get('/me', async (req, res) => {
+router.get("/me", async (req, res) => {
   if (!req.session.userId) {
-    res.status(401).json({ message: 'Not authenticated.' });
+    res.status(401).json({ message: "Not authenticated." });
     return;
   }
 
@@ -195,35 +199,34 @@ router.get('/me', async (req, res) => {
 
     if (!user) {
       req.session.destroy(() => {});
-      res.clearCookie('uaround.sid');
-      res.status(401).json({ message: 'Not authenticated.' });
+      res.clearCookie("uaround.sid");
+      res.status(401).json({ message: "Not authenticated." });
       return;
     }
 
     res.json({ user });
   } catch (error) {
-    console.error('Failed to load current user:', error);
-    res.status(500).json({ message: 'Failed to load current user.' });
+    console.error("Failed to load current user:", error);
+    res.status(500).json({ message: "Failed to load current user." });
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post("/logout", (req, res) => {
   req.session.destroy((error) => {
     if (error) {
-      console.error('Failed to destroy session:', error);
-      res.status(500).json({ message: 'Logout failed.' });
+      console.error("Failed to destroy session:", error);
+      res.status(500).json({ message: "Logout failed." });
       return;
     }
 
-    res.clearCookie('uaround.sid', {
+    res.clearCookie("uaround.sid", {
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
 
-    res.status(200).json({ message: 'Logged out successfully.' });
+    res.status(200).json({ message: "Logged out successfully." });
   });
 });
-
 
 export default router;

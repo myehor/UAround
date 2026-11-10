@@ -320,7 +320,7 @@
 }
 
 .event-details-page__bring li::before {
-  content: '✓';
+  content: "✓";
   position: absolute;
   left: 0;
   top: -1px;
@@ -534,7 +534,6 @@
   background: #2d7599;
 }
 
-
 .event-details-page__registration-success {
   padding-top: 0;
   border-top: none;
@@ -575,12 +574,10 @@
   padding: 22px 20px;
 }
 
-.event-details-page__registration:has(
-  .event-details-page__registration-success
-) .event-details-page__register {
+.event-details-page__registration:has(.event-details-page__registration-success)
+  .event-details-page__register {
   margin-top: 18px;
 }
-
 
 .event-details-page__capacity {
   margin-top: 16px;
@@ -1048,8 +1045,7 @@
   transition: transform 0.25s ease;
 }
 
-.event-details-page__similar-card:hover
-  .event-details-page__similar-image img {
+.event-details-page__similar-card:hover .event-details-page__similar-image img {
   transform: scale(1.03);
 }
 
@@ -1359,7 +1355,6 @@
   }
 }
 
-
 .event-details-page__cancel-registration {
   display: block;
   width: 100%;
@@ -1389,7 +1384,6 @@
   cursor: not-allowed;
   opacity: 0.6;
 }
-
 
 .event-details-page__organizer-actions {
   display: flex;
@@ -1424,7 +1418,7 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .event-details-page {
     background: var(--color-background);
     color: var(--color-text);

@@ -1,39 +1,38 @@
+import "dotenv/config";
 
-import 'dotenv/config';
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client.js";
+import { mockEvents } from "../src/data/mockEvents.js";
 
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../generated/prisma/client.js';
-import { mockEvents } from '../src/data/mockEvents.js';
-
-import type { EventCreateManyInput } from '../generated/prisma/models/Event.js';
+import type { EventCreateManyInput } from "../generated/prisma/models/Event.js";
 
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('DATABASE_URL is not configured in the .env file');
+  throw new Error("DATABASE_URL is not configured in the .env file");
 }
 
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-function mapCategory(category: string): EventCreateManyInput['category'] {
-  if (category === 'IT & Networking') {
-    return 'IT_NETWORKING';
+function mapCategory(category: string): EventCreateManyInput["category"] {
+  if (category === "IT & Networking") {
+    return "IT_NETWORKING";
   }
 
-  return category as EventCreateManyInput['category'];
+  return category as EventCreateManyInput["category"];
 }
 
-function mapStatus(status: string): EventCreateManyInput['status'] {
-  if (status === 'almost-full') {
-    return 'almostFull';
+function mapStatus(status: string): EventCreateManyInput["status"] {
+  if (status === "almost-full") {
+    return "almostFull";
   }
 
-  if (status === 'fully-booked') {
-    return 'fullyBooked';
+  if (status === "fully-booked") {
+    return "fullyBooked";
   }
 
-  return status as EventCreateManyInput['status'];
+  return status as EventCreateManyInput["status"];
 }
 
 async function main() {
@@ -53,7 +52,7 @@ async function main() {
 
 main()
   .catch((error: unknown) => {
-    console.error('Seed failed:', error);
+    console.error("Seed failed:", error);
     process.exitCode = 1;
   })
   .finally(async () => {

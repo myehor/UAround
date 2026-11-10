@@ -1,26 +1,25 @@
+import { randomUUID } from "node:crypto";
+import { Router } from "express";
+import { z } from "zod";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { randomUUID } from 'node:crypto';
-import { Router } from 'express';
-import { z } from 'zod';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-import { prisma } from './lib/prisma.js';
+import { prisma } from "./lib/prisma.js";
 
 const router = Router();
 
 const eventCategories = [
-  'Sport',
-  'Party',
-  'Social',
-  'Music',
-  'IT & Networking',
-  'Education',
-  'Family',
-  'Culture',
-  'Volunteering',
-  'Other',
+  "Sport",
+  "Party",
+  "Social",
+  "Music",
+  "IT & Networking",
+  "Education",
+  "Family",
+  "Culture",
+  "Volunteering",
+  "Other",
 ] as const;
 
 const createEventSchema = z.object({
@@ -31,7 +30,10 @@ const createEventSchema = z.object({
   imageData: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   startTime: z.string().regex(/^\d{2}:\d{2}$/),
-  endTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  endTime: z
+    .string()
+    .regex(/^\d{2}:\d{2}$/)
+    .optional(),
   bundesland: z.string().trim().min(1).max(100),
   city: z.string().trim().min(1).max(100),
   venue: z.string().trim().min(1).max(200),
@@ -39,27 +41,27 @@ const createEventSchema = z.object({
   participantLimit: z.number().int().min(1).max(10000).optional(),
 });
 
-function formatEvent<T extends {
-  category: string;
-  status: string;
-}>(event: T) {
+function formatEvent<
+  T extends {
+    category: string;
+    status: string;
+  },
+>(event: T) {
   return {
     ...event,
     category:
-      event.category === 'IT_NETWORKING'
-        ? 'IT & Networking'
-        : event.category,
+      event.category === "IT_NETWORKING" ? "IT & Networking" : event.category,
     status:
-      event.status === 'almostFull'
-        ? 'almost-full'
-        : event.status === 'fullyBooked'
-          ? 'fully-booked'
+      event.status === "almostFull"
+        ? "almost-full"
+        : event.status === "fullyBooked"
+          ? "fully-booked"
           : event.status,
   };
 }
 
 // GET /api/events — общий каталог
-router.get('/', async (_req, res) => {
+router.get("/", async (_req, res) => {
   try {
     const databaseEvents = await prisma.event.findMany({
       include: {
@@ -72,32 +74,32 @@ router.get('/', async (_req, res) => {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     const events = databaseEvents.map(formatEvent);
 
     res.json({
-      message: 'Events loaded successfully.',
+      message: "Events loaded successfully.",
       total: events.length,
       events,
     });
   } catch (error) {
-    console.error('Failed to fetch events:', error);
+    console.error("Failed to fetch events:", error);
 
     res.status(500).json({
-      message: 'Failed to fetch events from the database.',
+      message: "Failed to fetch events from the database.",
     });
   }
 });
 
 // GET /api/events/my — мероприятия, созданные текущим пользователем
-router.get('/my', async (req, res) => {
+router.get("/my", async (req, res) => {
   const userId = req.session.userId;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to view your events.',
+      message: "Please sign in to view your events.",
     });
     return;
   }
@@ -105,46 +107,46 @@ router.get('/my', async (req, res) => {
   try {
     const databaseEvents = await prisma.event.findMany({
       where: { ownerUserId: userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     const events = databaseEvents.map(formatEvent);
 
     res.json({
-      message: 'Your events loaded successfully.',
+      message: "Your events loaded successfully.",
       total: events.length,
       events,
     });
   } catch (error) {
-    console.error('Failed to fetch user events:', error);
+    console.error("Failed to fetch user events:", error);
 
     res.status(500).json({
-      message: 'Failed to fetch your events.',
+      message: "Failed to fetch your events.",
     });
   }
 });
 
 // GET /api/events/:eventId/registration
-router.get('/:eventId/registration', async (req, res) => {
-  const userId = req.session.userId
-  const { eventId } = req.params
+router.get("/:eventId/registration", async (req, res) => {
+  const userId = req.session.userId;
+  const { eventId } = req.params;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to check your registration.',
-    })
-    return
+      message: "Please sign in to check your registration.",
+    });
+    return;
   }
 
   try {
     const event = await prisma.event.findUnique({
       where: { id: eventId },
       select: { id: true },
-    })
+    });
 
     if (!event) {
-      res.status(404).json({ message: 'Event not found.' })
-      return
+      res.status(404).json({ message: "Event not found." });
+      return;
     }
 
     const registration = await prisma.eventRegistration.findUnique({
@@ -152,22 +154,22 @@ router.get('/:eventId/registration', async (req, res) => {
         userId_eventId: { userId, eventId },
       },
       select: { id: true },
-    })
+    });
 
     res.status(200).json({
       isRegistered: Boolean(registration),
-    })
+    });
   } catch (error) {
-    console.error('Failed to check event registration:', error)
+    console.error("Failed to check event registration:", error);
 
     res.status(500).json({
-      message: 'Failed to check registration status.',
-    })
+      message: "Failed to check registration status.",
+    });
   }
-})
+});
 
 // GET /api/events/:eventId/participants — участники мероприятия
-router.get('/:eventId/participants', async (req, res) => {
+router.get("/:eventId/participants", async (req, res) => {
   const { eventId } = req.params;
 
   try {
@@ -178,7 +180,7 @@ router.get('/:eventId/participants', async (req, res) => {
 
     if (!event) {
       res.status(404).json({
-        message: 'Event not found.',
+        message: "Event not found.",
       });
       return;
     }
@@ -196,7 +198,7 @@ router.get('/:eventId/participants', async (req, res) => {
           },
         },
       },
-      orderBy: { registeredAt: 'asc' },
+      orderBy: { registeredAt: "asc" },
     });
 
     const participants = registrations.map(({ user }) => ({
@@ -207,27 +209,27 @@ router.get('/:eventId/participants', async (req, res) => {
     }));
 
     res.json({
-      message: 'Event participants loaded successfully.',
+      message: "Event participants loaded successfully.",
       total: participants.length,
       participants,
     });
   } catch (error) {
-    console.error('Failed to fetch event participants:', error);
+    console.error("Failed to fetch event participants:", error);
 
     res.status(500).json({
-      message: 'Failed to fetch event participants.',
+      message: "Failed to fetch event participants.",
     });
   }
 });
 
 // POST /api/events/:eventId/register — регистрация на мероприятие
-router.post('/:eventId/register', async (req, res) => {
+router.post("/:eventId/register", async (req, res) => {
   const userId = req.session.userId;
   const { eventId } = req.params;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to register for an event.',
+      message: "Please sign in to register for an event.",
     });
     return;
   }
@@ -246,27 +248,27 @@ router.post('/:eventId/register', async (req, res) => {
         });
 
         if (!event) {
-          return { status: 404, message: 'Event not found.' };
+          return { status: 404, message: "Event not found." };
         }
 
         if (event.ownerUserId === userId || event.creatorId === userId) {
           return {
             status: 400,
-            message: 'You cannot register for your own event.',
+            message: "You cannot register for your own event.",
           };
         }
 
-        if (event.status !== 'open' && event.status !== 'almostFull') {
+        if (event.status !== "open" && event.status !== "almostFull") {
           return {
             status: 400,
-            message: 'This event is not open for registration.',
+            message: "This event is not open for registration.",
           };
         }
 
         if (event.registrations.length > 0) {
           return {
             status: 409,
-            message: 'You are already registered for this event.',
+            message: "You are already registered for this event.",
           };
         }
 
@@ -280,7 +282,7 @@ router.post('/:eventId/register', async (req, res) => {
         ) {
           return {
             status: 400,
-            message: 'This event is fully booked.',
+            message: "This event is fully booked.",
           };
         }
 
@@ -290,13 +292,12 @@ router.post('/:eventId/register', async (req, res) => {
 
         const nextCount = registeredCount + 1;
         const nextStatus =
-          event.participantLimit !== null &&
-          nextCount >= event.participantLimit
-            ? 'fullyBooked'
+          event.participantLimit !== null && nextCount >= event.participantLimit
+            ? "fullyBooked"
             : event.participantLimit !== null &&
                 nextCount >= event.participantLimit * 0.8
-              ? 'almostFull'
-              : 'open';
+              ? "almostFull"
+              : "open";
 
         await tx.event.update({
           where: { id: eventId },
@@ -309,32 +310,32 @@ router.post('/:eventId/register', async (req, res) => {
 
         return {
           status: 201,
-          message: 'Successfully registered for the event.',
+          message: "Successfully registered for the event.",
           registeredCount: nextCount,
           registrationStatus: nextStatus,
         };
       },
-      { isolationLevel: 'Serializable' },
+      { isolationLevel: "Serializable" },
     );
 
     res.status(result.status).json(result);
   } catch (error) {
-    console.error('Failed to register for event:', error);
+    console.error("Failed to register for event:", error);
 
     res.status(500).json({
-      message: 'Failed to register for this event. Please try again.',
+      message: "Failed to register for this event. Please try again.",
     });
   }
 });
 
 // DELETE /api/events/:eventId/register — отмена регистрации
-router.delete('/:eventId/register', async (req, res) => {
+router.delete("/:eventId/register", async (req, res) => {
   const userId = req.session.userId;
   const { eventId } = req.params;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to cancel your registration.',
+      message: "Please sign in to cancel your registration.",
     });
     return;
   }
@@ -347,7 +348,7 @@ router.delete('/:eventId/register', async (req, res) => {
         });
 
         if (!event) {
-          return { status: 404, message: 'Event not found.' };
+          return { status: 404, message: "Event not found." };
         }
 
         const registration = await tx.eventRegistration.findUnique({
@@ -359,7 +360,7 @@ router.delete('/:eventId/register', async (req, res) => {
         if (!registration) {
           return {
             status: 404,
-            message: 'You are not registered for this event.',
+            message: "You are not registered for this event.",
           };
         }
 
@@ -373,15 +374,15 @@ router.delete('/:eventId/register', async (req, res) => {
         );
 
         const nextStatus =
-          event.status === 'closed' || event.status === 'cancelled'
+          event.status === "closed" || event.status === "cancelled"
             ? event.status
             : event.participantLimit !== null &&
                 nextCount >= event.participantLimit
-              ? 'fullyBooked'
+              ? "fullyBooked"
               : event.participantLimit !== null &&
                   nextCount >= event.participantLimit * 0.8
-                ? 'almostFull'
-                : 'open';
+                ? "almostFull"
+                : "open";
 
         await tx.event.update({
           where: { id: eventId },
@@ -394,32 +395,31 @@ router.delete('/:eventId/register', async (req, res) => {
 
         return {
           status: 200,
-          message: 'Registration cancelled successfully.',
+          message: "Registration cancelled successfully.",
           registeredCount: nextCount,
           registrationStatus: nextStatus,
         };
       },
-      { isolationLevel: 'Serializable' },
+      { isolationLevel: "Serializable" },
     );
 
     res.status(result.status).json(result);
   } catch (error) {
-    console.error('Failed to cancel event registration:', error);
+    console.error("Failed to cancel event registration:", error);
 
     res.status(500).json({
-      message: 'Failed to cancel registration. Please try again.',
+      message: "Failed to cancel registration. Please try again.",
     });
   }
 });
 
-
- // GET /api/events/my/attending — мероприятия, на которые записан текущий пользователь
-router.get('/my/attending', async (req, res) => {
+// GET /api/events/my/attending — мероприятия, на которые записан текущий пользователь
+router.get("/my/attending", async (req, res) => {
   const userId = req.session.userId;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to view your attending events.',
+      message: "Please sign in to view your attending events.",
     });
     return;
   }
@@ -430,34 +430,33 @@ router.get('/my/attending', async (req, res) => {
       include: {
         event: true,
       },
-      orderBy: { registeredAt: 'desc' },
+      orderBy: { registeredAt: "desc" },
     });
 
     const events = registrations.map(({ event }) => formatEvent(event));
 
     res.json({
-      message: 'Your attending events loaded successfully.',
+      message: "Your attending events loaded successfully.",
       total: events.length,
       events,
     });
   } catch (error) {
-    console.error('Failed to fetch attending events:', error);
+    console.error("Failed to fetch attending events:", error);
 
     res.status(500).json({
-      message: 'Failed to fetch your attending events.',
+      message: "Failed to fetch your attending events.",
     });
   }
 });
 
-
 // POST /api/events — создание мероприятия от имени текущего пользователя
 
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   const userId = req.session.userId;
 
   if (!userId) {
     res.status(401).json({
-      message: 'Please sign in to create an event.',
+      message: "Please sign in to create an event.",
     });
     return;
   }
@@ -466,9 +465,9 @@ router.post('/', async (req, res) => {
 
   if (!validation.success) {
     res.status(400).json({
-      message: 'Please check the event data.',
+      message: "Please check the event data.",
       errors: validation.error.issues.map((issue) => ({
-        field: issue.path.join('.'),
+        field: issue.path.join("."),
         message: issue.message,
       })),
     });
@@ -479,14 +478,14 @@ router.post('/', async (req, res) => {
 
   if (data.endTime && data.endTime <= data.startTime) {
     res.status(400).json({
-      message: 'End time must be later than start time.',
+      message: "End time must be later than start time.",
     });
     return;
   }
 
   if (data.date < new Date().toISOString().slice(0, 10)) {
     res.status(400).json({
-      message: 'Event date cannot be in the past.',
+      message: "Event date cannot be in the past.",
     });
     return;
   }
@@ -499,12 +498,12 @@ router.post('/', async (req, res) => {
 
     if (!user) {
       res.status(401).json({
-        message: 'Your account could not be found. Please sign in again.',
+        message: "Your account could not be found. Please sign in again.",
       });
       return;
     }
 
-    let imageUrl = '/images/event-placeholder.png';
+    let imageUrl = "/images/event-placeholder.png";
 
     if (data.imageData) {
       const match = data.imageData.match(
@@ -513,29 +512,26 @@ router.post('/', async (req, res) => {
 
       if (!match) {
         res.status(400).json({
-          message: 'Please upload a valid JPG, PNG, or WebP image.',
+          message: "Please upload a valid JPG, PNG, or WebP image.",
         });
         return;
       }
 
-      const extension = match[1] === 'jpeg' ? 'jpg' : match[1];
-      const imageBuffer = Buffer.from(match[2], 'base64');
+      const extension = match[1] === "jpeg" ? "jpg" : match[1];
+      const imageBuffer = Buffer.from(match[2], "base64");
 
-      if (
-        imageBuffer.length === 0 ||
-        imageBuffer.length > 5 * 1024 * 1024
-      ) {
+      if (imageBuffer.length === 0 || imageBuffer.length > 5 * 1024 * 1024) {
         res.status(400).json({
-          message: 'Event image must be no larger than 5 MB.',
+          message: "Event image must be no larger than 5 MB.",
         });
         return;
       }
 
       const uploadsDir = path.resolve(
         path.dirname(fileURLToPath(import.meta.url)),
-        '..',
-        'uploads',
-        'events',
+        "..",
+        "uploads",
+        "events",
       );
 
       await mkdir(uploadsDir, { recursive: true });
@@ -549,9 +545,7 @@ router.post('/', async (req, res) => {
 
     const now = new Date().toISOString();
     const category =
-      data.category === 'IT & Networking'
-        ? 'IT_NETWORKING'
-        : data.category;
+      data.category === "IT & Networking" ? "IT_NETWORKING" : data.category;
 
     const createdEvent = await prisma.event.create({
       data: {
@@ -569,7 +563,7 @@ router.post('/', async (req, res) => {
         address: data.address || null,
         participantLimit: data.participantLimit,
         registeredCount: 0,
-        status: 'open',
+        status: "open",
         creatorId: user.id,
         ownerUserId: user.id,
         createdAt: now,
@@ -588,26 +582,25 @@ router.post('/', async (req, res) => {
     });
 
     res.status(201).json({
-      message: 'Event created successfully.',
+      message: "Event created successfully.",
       event: formatEvent(createdEvent),
     });
   } catch (error) {
-    console.error('Failed to create event:', error);
+    console.error("Failed to create event:", error);
 
     res.status(500).json({
-      message: 'Failed to create event. Please try again later.',
+      message: "Failed to create event. Please try again later.",
     });
   }
 });
 
-
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const userId = req.session.userId
+    const userId = req.session.userId;
 
     if (!userId) {
-      res.status(401).json({ message: 'Authentication required.' })
-      return
+      res.status(401).json({ message: "Authentication required." });
+      return;
     }
 
     const event = await prisma.event.findUnique({
@@ -619,13 +612,13 @@ router.delete('/:id', async (req, res) => {
     });
 
     if (!event) {
-      res.status(404).json({ message: 'Event not found.' });
+      res.status(404).json({ message: "Event not found." });
       return;
     }
 
     if (event.creatorId !== userId) {
       res.status(403).json({
-        message: 'Only the event organizer can delete this event.',
+        message: "Only the event organizer can delete this event.",
       });
       return;
     }
@@ -635,17 +628,15 @@ router.delete('/:id', async (req, res) => {
     });
 
     res.status(200).json({
-      message: 'Event deleted successfully.',
+      message: "Event deleted successfully.",
     });
   } catch (error) {
-    console.error('Failed to delete event:', error);
+    console.error("Failed to delete event:", error);
 
     res.status(500).json({
-      message: 'Failed to delete event. Please try again later.',
+      message: "Failed to delete event. Please try again later.",
     });
   }
 });
-
-
 
 export default router;

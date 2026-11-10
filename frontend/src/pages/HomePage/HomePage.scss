@@ -1,5 +1,4 @@
-
-@use '../../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 .home-page {
   &__hero {
@@ -145,7 +144,7 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .home-page {
     background: var(--color-background);
     color: var(--color-text);

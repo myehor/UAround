@@ -1,5 +1,5 @@
-import AuthLayout from '../../../components/auth/AuthLayout/AuthLayout'
-import './ForgotPasswordPage.scss'
+import AuthLayout from "../../../components/auth/AuthLayout/AuthLayout";
+import "./ForgotPasswordPage.scss";
 
 function ForgotPasswordPage() {
   return (
@@ -12,8 +12,8 @@ function ForgotPasswordPage() {
           <h2>Reset your password</h2>
 
           <p>
-            Enter the email address connected to your
-            account and we’ll send you a reset link.
+            Enter the email address connected to your account and we’ll send you
+            a reset link.
           </p>
         </div>
 
@@ -29,23 +29,17 @@ function ForgotPasswordPage() {
             />
           </label>
 
-          <button
-            type="submit"
-            className="forgot-password-page__submit"
-          >
+          <button type="submit" className="forgot-password-page__submit">
             Send Reset Link
           </button>
         </form>
 
-        <a
-          className="forgot-password-page__back"
-          href="/login"
-        >
+        <a className="forgot-password-page__back" href="/login">
           ← Back to Sign In
         </a>
       </div>
     </AuthLayout>
-  )
+  );
 }
 
-export default ForgotPasswordPage
+export default ForgotPasswordPage;

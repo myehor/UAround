@@ -1,109 +1,108 @@
+import { useState } from "react";
+import eventPlaceholder from "../../assets/images/event-placeholder.png";
+import type { ChangeEvent, FormEvent } from "react";
 
-import { useState } from 'react'
-import eventPlaceholder from '../../assets/images/event-placeholder.png'
-import type { ChangeEvent, FormEvent } from 'react'
+import { createEvent } from "../../api/events";
+import type { EventCategory } from "../../types/event";
 
-import { createEvent } from '../../api/events'
-import type { EventCategory } from '../../types/event'
-
-import './CreateEventPage.scss'
+import "./CreateEventPage.scss";
 
 const eventCategories: EventCategory[] = [
-  'Sport',
-  'Culture',
-  'Music',
-  'Education',
-  'IT & Networking',
-  'Social',
-  'Party',
-  'Family',
-  'Volunteering',
-  'Other',
-]
+  "Sport",
+  "Culture",
+  "Music",
+  "Education",
+  "IT & Networking",
+  "Social",
+  "Party",
+  "Family",
+  "Volunteering",
+  "Other",
+];
 
 const categoryIcons: Record<EventCategory, string> = {
-  Sport: '⚽',
-  Culture: '🎭',
-  Music: '♫',
-  Education: '🎓',
-  'IT & Networking': '👥',
-  Social: '🤝',
-  Party: '🎉',
-  Family: '👨‍👩‍👧',
-  Volunteering: '💚',
-  Other: '✦',
-}
-
+  Sport: "⚽",
+  Culture: "🎭",
+  Music: "♫",
+  Education: "🎓",
+  "IT & Networking": "👥",
+  Social: "🤝",
+  Party: "🎉",
+  Family: "👨‍👩‍👧",
+  Volunteering: "💚",
+  Other: "✦",
+};
 
 function CreateEventPage() {
-  const [selectedCategory, setSelectedCategory] = useState<EventCategory>('Sport')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState('')
-  const [eventImage, setEventImage] = useState(eventPlaceholder)
-  const [eventImageFile, setEventImageFile] = useState<File | null>(null)
+  const [selectedCategory, setSelectedCategory] =
+    useState<EventCategory>("Sport");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [eventImage, setEventImage] = useState(eventPlaceholder);
+  const [eventImageFile, setEventImageFile] = useState<File | null>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
 
     if (!file) {
-      return
+      return;
     }
 
-    const imageUrl = URL.createObjectURL(file)
-    setEventImageFile(file)
-    setEventImage(imageUrl)
-  }
-
+    const imageUrl = URL.createObjectURL(file);
+    setEventImageFile(file);
+    setEventImage(imageUrl);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSubmitError('')
+    event.preventDefault();
+    setSubmitError("");
 
-    const formData = new FormData(event.currentTarget)
+    const formData = new FormData(event.currentTarget);
 
-    const title = String(formData.get('title') ?? '').trim()
-    const description = String(formData.get('description') ?? '').trim()
-    const date = String(formData.get('date') ?? '')
-    const startTime = String(formData.get('startTime') ?? '')
-    const endTime = String(formData.get('endTime') ?? '')
-    const city = String(formData.get('city') ?? '').trim()
-    const venue = String(formData.get('venue') ?? '').trim()
+    const title = String(formData.get("title") ?? "").trim();
+    const description = String(formData.get("description") ?? "").trim();
+    const date = String(formData.get("date") ?? "");
+    const startTime = String(formData.get("startTime") ?? "");
+    const endTime = String(formData.get("endTime") ?? "");
+    const city = String(formData.get("city") ?? "").trim();
+    const venue = String(formData.get("venue") ?? "").trim();
 
     if (!title || !description || !date || !startTime || !city || !venue) {
-      setSubmitError('Please fill in all required fields.')
-      return
+      setSubmitError("Please fill in all required fields.");
+      return;
     }
 
     if (description.length < 10) {
-      setSubmitError('Description must contain at least 10 characters.')
-      return
+      setSubmitError("Description must contain at least 10 characters.");
+      return;
     }
 
     if (endTime && endTime <= startTime) {
-      setSubmitError('End time must be later than start time.')
-      return
+      setSubmitError("End time must be later than start time.");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      let imageData: string | undefined
+      let imageData: string | undefined;
 
       if (eventImageFile) {
         imageData = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
+          const reader = new FileReader();
 
           reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              resolve(reader.result)
+            if (typeof reader.result === "string") {
+              resolve(reader.result);
             } else {
-              reject(new Error('Failed to read event image.'))
+              reject(new Error("Failed to read event image."));
             }
-          }
+          };
 
-          reader.onerror = () => reject(new Error('Failed to read event image.'))
-          reader.readAsDataURL(eventImageFile)
-        })
+          reader.onerror = () =>
+            reject(new Error("Failed to read event image."));
+          reader.readAsDataURL(eventImageFile);
+        });
       }
 
       const createdEvent = await createEvent({
@@ -114,22 +113,22 @@ function CreateEventPage() {
         date,
         startTime,
         ...(endTime ? { endTime } : {}),
-        bundesland: 'Bayern',
+        bundesland: "Bayern",
         city,
         venue,
-      })
+      });
 
-      window.location.assign(`/events/${createdEvent.id}`)
+      window.location.assign(`/events/${createdEvent.id}`);
     } catch (error) {
       setSubmitError(
         error instanceof Error
           ? error.message
-          : 'Failed to create event. Please try again.',
-      )
+          : "Failed to create event. Please try again.",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <main className="create-event-page">
@@ -137,7 +136,11 @@ function CreateEventPage() {
         <aside className="create-event-page__steps">
           <div className="create-event-page__step create-event-page__step--active">
             <span>1</span>
-            <strong>Basic<br />Information</strong>
+            <strong>
+              Basic
+              <br />
+              Information
+            </strong>
           </div>
 
           <div className="create-event-page__step">
@@ -161,10 +164,7 @@ function CreateEventPage() {
           </div>
         </aside>
 
-        <form
-          className="create-event-page__form"
-          onSubmit={handleSubmit}
-        >
+        <form className="create-event-page__form" onSubmit={handleSubmit}>
           <div className="create-event-page__form-heading">
             <h1>Create a new event</h1>
             <p>
@@ -204,9 +204,7 @@ function CreateEventPage() {
                 </label>
 
                 <label className="create-event-page__upload">
-                  <span className="create-event-page__upload-icon">
-                    ＋
-                  </span>
+                  <span className="create-event-page__upload-icon">＋</span>
 
                   <strong>Upload event image</strong>
                   <small>JPG, PNG · Max 5 MB</small>
@@ -225,7 +223,7 @@ function CreateEventPage() {
                 <button
                   type="button"
                   aria-label="Remove event image"
-                  onClick={() => setEventImage('')}
+                  onClick={() => setEventImage("")}
                 >
                   ×
                 </button>
@@ -244,11 +242,7 @@ function CreateEventPage() {
                 Date <b>*</b>
               </span>
 
-              <input
-                type="date"
-                name="date"
-                defaultValue="2026-10-17"
-              />
+              <input type="date" name="date" defaultValue="2026-10-17" />
             </label>
 
             <div className="create-event-page__two-columns">
@@ -257,11 +251,7 @@ function CreateEventPage() {
                   Start time <b>*</b>
                 </span>
 
-                <input
-                  type="time"
-                  name="startTime"
-                  defaultValue="18:00"
-                />
+                <input type="time" name="startTime" defaultValue="18:00" />
               </label>
 
               <label className="create-event-page__field">
@@ -269,11 +259,7 @@ function CreateEventPage() {
                   End time <small>(optional)</small>
                 </span>
 
-                <input
-                  type="time"
-                  name="endTime"
-                  defaultValue="20:00"
-                />
+                <input type="time" name="endTime" defaultValue="20:00" />
               </label>
             </div>
 
@@ -282,11 +268,7 @@ function CreateEventPage() {
                 Location <b>*</b>
               </span>
 
-              <input
-                type="text"
-                name="city"
-                defaultValue="Würzburg"
-              />
+              <input type="text" name="city" defaultValue="Würzburg" />
             </label>
 
             <label className="create-event-page__field">
@@ -302,9 +284,7 @@ function CreateEventPage() {
             </label>
 
             <div className="create-event-page__map">
-              <div className="create-event-page__map-city">
-                Würzburg
-              </div>
+              <div className="create-event-page__map-city">Würzburg</div>
 
               <div className="create-event-page__map-pin">
                 <span>●</span>
@@ -334,14 +314,12 @@ function CreateEventPage() {
                   type="button"
                   className={
                     selectedCategory === category
-                      ? 'create-event-page__category create-event-page__category--active'
-                      : 'create-event-page__category'
+                      ? "create-event-page__category create-event-page__category--active"
+                      : "create-event-page__category"
                   }
                   onClick={() => setSelectedCategory(category)}
                 >
-                  <span>
-                    {categoryIcons[category]}
-                  </span>
+                  <span>{categoryIcons[category]}</span>
 
                   {category}
                 </button>
@@ -355,8 +333,8 @@ function CreateEventPage() {
               <div>
                 <h2>Description</h2>
                 <p>
-                  Tell people more about your event. What will you do?
-                  Who is it for?
+                  Tell people more about your event. What will you do? Who is it
+                  for?
                 </p>
               </div>
             </div>
@@ -386,8 +364,8 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
               <div>
                 <h2>Review and Create</h2>
                 <p>
-                  Once you’re ready, create your event and share it with
-                  the community.
+                  Once you’re ready, create your event and share it with the
+                  community.
                 </p>
               </div>
             </div>
@@ -396,12 +374,9 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
               <input type="checkbox" defaultChecked />
 
               <span>
-                I confirm that this event is open to everyone in the
-                Ukrainian community and follows the UAround{' '}
-                <a href="/community-guidelines">
-                  community guidelines
-                </a>
-                .
+                I confirm that this event is open to everyone in the Ukrainian
+                community and follows the UAround{" "}
+                <a href="/community-guidelines">community guidelines</a>.
               </span>
             </label>
 
@@ -422,7 +397,7 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
                 disabled={isSubmitting}
               >
                 <span aria-hidden="true">✣</span>
-                {isSubmitting ? 'Creating event...' : 'Create Event'}
+                {isSubmitting ? "Creating event..." : "Create Event"}
               </button>
             </div>
           </section>
@@ -435,12 +410,7 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
             <p>Here’s how your event will look to other users.</p>
 
             <div className="create-event-page__event-preview">
-              {eventImage && (
-                <img
-                  src={eventImage}
-                  alt="Event preview"
-                />
-              )}
+              {eventImage && <img src={eventImage} alt="Event preview" />}
 
               <div className="create-event-page__event-preview-content">
                 <span className="create-event-page__preview-category">
@@ -470,29 +440,24 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
                   <small>0 going</small>
                 </div>
 
-                <button type="button">
-                  Register
-                </button>
+                <button type="button">Register</button>
 
                 <div className="create-event-page__preview-description">
+                  <p>Let’s meet and play football together! ⚽</p>
+
                   <p>
-                    Let’s meet and play football together! ⚽
+                    A friendly game for Ukrainians in Würzburg. All skill levels
+                    are welcome – whether you play often or just for fun.
                   </p>
 
                   <p>
-                    A friendly game for Ukrainians in Würzburg. All
-                    skill levels are welcome – whether you play often
-                    or just for fun.
+                    We’ll have a full-size field, good music, and a relaxed
+                    atmosphere.
                   </p>
 
                   <p>
-                    We’ll have a full-size field, good music, and a
-                    relaxed atmosphere.
-                  </p>
-
-                  <p>
-                    Bring sports clothes, football shoes, water, and
-                    good mood! 💪
+                    Bring sports clothes, football shoes, water, and good mood!
+                    💪
                   </p>
                 </div>
               </div>
@@ -548,7 +513,7 @@ Bring sports clothes, football shoes, water, and good mood! 💪`}
         </aside>
       </div>
     </main>
-  )
+  );
 }
 
-export default CreateEventPage
+export default CreateEventPage;

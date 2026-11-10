@@ -1,5 +1,4 @@
-
-@use '../../../styles/variables' as *;
+@use "../../../styles/variables" as *;
 
 .header {
   position: relative;
@@ -66,7 +65,7 @@
         left: 0;
         height: 2px;
         background-color: $color-primary;
-        content: '';
+        content: "";
       }
     }
   }

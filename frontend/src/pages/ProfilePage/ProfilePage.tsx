@@ -1,36 +1,43 @@
-
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
-import { getProfile, updateProfile, uploadAvatar, type UserProfile } from '../../api/profile'
 import {
-  getMyEvents,
-  getAttendingEvents,
-} from '../../api/events'
-import { useAuth } from '../../context/useAuth'
-import { useTheme } from '../../context/useTheme'
-import { bundeslaender, getCities } from '../../data/locations'
-import type { Event } from '../../types/event'
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import {
+  getProfile,
+  updateProfile,
+  uploadAvatar,
+  type UserProfile,
+} from "../../api/profile";
+import { getMyEvents, getAttendingEvents } from "../../api/events";
+import { useAuth } from "../../context/useAuth";
+import { useTheme } from "../../context/useTheme";
+import { bundeslaender, getCities } from "../../data/locations";
+import type { Event } from "../../types/event";
 
-import './ProfilePage.scss'
+import "./ProfilePage.scss";
 
 type ProfileForm = {
-  firstName: string
-  lastName: string
-  bundesland: string
-  city: string
-  bio: string
-  phone: string
-  languages: string
-}
+  firstName: string;
+  lastName: string;
+  bundesland: string;
+  city: string;
+  bio: string;
+  phone: string;
+  languages: string;
+};
 
 const emptyForm: ProfileForm = {
-  firstName: '',
-  lastName: '',
-  bundesland: '',
-  city: '',
-  bio: '',
-  phone: '',
-  languages: '',
-}
+  firstName: "",
+  lastName: "",
+  bundesland: "",
+  city: "",
+  bio: "",
+  phone: "",
+  languages: "",
+};
 
 function toForm(profile: UserProfile): ProfileForm {
   return {
@@ -38,330 +45,321 @@ function toForm(profile: UserProfile): ProfileForm {
     lastName: profile.lastName,
     bundesland: profile.bundesland,
     city: profile.city,
-    bio: profile.bio ?? '',
-    phone: profile.phone ?? '',
-    languages: profile.languages.join(', '),
-  }
+    bio: profile.bio ?? "",
+    phone: profile.phone ?? "",
+    languages: profile.languages.join(", "),
+  };
 }
 
-
-type PhoneCountry = '+380' | '+49'
+type PhoneCountry = "+380" | "+49";
 
 function getPhoneCountry(phone: string): PhoneCountry {
-  return phone.startsWith('+380') ? '+380' : '+49'
+  return phone.startsWith("+380") ? "+380" : "+49";
 }
 
 function getPhoneDigits(phone: string, country: PhoneCountry): string {
-  const digits = phone.replace(/\D/g, '')
-  const countryDigits = country.slice(1)
+  const digits = phone.replace(/\D/g, "");
+  const countryDigits = country.slice(1);
 
   if (digits.startsWith(countryDigits)) {
-    return digits.slice(countryDigits.length)
+    return digits.slice(countryDigits.length);
   }
 
-  return digits
+  return digits;
 }
 
 function formatPhoneNumber(value: string, country: PhoneCountry): string {
-  const maxDigits = country === '+380' ? 9 : 11
-  const digits = value.replace(/\D/g, '').slice(0, maxDigits)
-  const groups = country === '+380' ? [2, 3, 4] : [3, 3, 2, 3]
+  const maxDigits = country === "+380" ? 9 : 11;
+  const digits = value.replace(/\D/g, "").slice(0, maxDigits);
+  const groups = country === "+380" ? [2, 3, 4] : [3, 3, 2, 3];
 
-  const parts: string[] = []
-  let position = 0
+  const parts: string[] = [];
+  let position = 0;
 
   for (const size of groups) {
-    if (position >= digits.length) break
+    if (position >= digits.length) break;
 
-    parts.push(digits.slice(position, position + size))
-    position += size
+    parts.push(digits.slice(position, position + size));
+    position += size;
   }
 
-  return parts.join('-')
+  return parts.join("-");
 }
 
 function formatStoredPhone(country: PhoneCountry, digits: string): string {
-  const formatted = formatPhoneNumber(digits, country)
-  return formatted ? `${country} ${formatted}` : ''
+  const formatted = formatPhoneNumber(digits, country);
+  return formatted ? `${country} ${formatted}` : "";
 }
 
-
 const AVAILABLE_LANGUAGES = [
-  { name: 'Ukrainian', flag: '🇺🇦' },
-  { name: 'German', flag: '🇩🇪' },
-  { name: 'English', flag: '🇬🇧' },
-  { name: 'Russian', flag: '🇷🇺' },
-  { name: 'Spanish', flag: '🇪🇸' },
-  { name: 'French', flag: '🇫🇷' },
-  { name: 'Portuguese', flag: '🇵🇹' },
-  { name: 'Italian', flag: '🇮🇹' },
-  { name: 'Polish', flag: '🇵🇱' },
-  { name: 'Arabic', flag: '🇸🇦' },
-] as const
+  { name: "Ukrainian", flag: "🇺🇦" },
+  { name: "German", flag: "🇩🇪" },
+  { name: "English", flag: "🇬🇧" },
+  { name: "Russian", flag: "🇷🇺" },
+  { name: "Spanish", flag: "🇪🇸" },
+  { name: "French", flag: "🇫🇷" },
+  { name: "Portuguese", flag: "🇵🇹" },
+  { name: "Italian", flag: "🇮🇹" },
+  { name: "Polish", flag: "🇵🇱" },
+  { name: "Arabic", flag: "🇸🇦" },
+] as const;
 
 function ProfilePage() {
-  const { refreshUser, logout } = useAuth()
-  const { theme, toggleTheme } = useTheme()
+  const { refreshUser, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [events, setEvents] = useState<Event[]>([])
-  const [attendingEvents, setAttendingEvents] = useState<Event[]>([])
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [attendingEvents, setAttendingEvents] = useState<Event[]>([]);
   const [activeEventsTab, setActiveEventsTab] = useState<
-    'attending' | 'organizing'
-  >('attending')
+    "attending" | "organizing"
+  >("attending");
 
-  const [eventsPage, setEventsPage] = useState(1)
-  const eventsSectionRef = useRef<HTMLElement>(null)
-  
+  const [eventsPage, setEventsPage] = useState(1);
+  const eventsSectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
-    if (window.location.hash !== '#my-events') {
-      return
+    if (window.location.hash !== "#my-events") {
+      return;
     }
 
     const timer = window.setTimeout(() => {
       eventsSectionRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      })
+        behavior: "smooth",
+        block: "start",
+      });
 
       window.history.replaceState(
         null,
-        '',
+        "",
         window.location.pathname + window.location.search,
-      )
-    }, 100)
+      );
+    }, 100);
 
-    return () => window.clearTimeout(timer)
-  }, [])
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const [eventsPerPage, setEventsPerPage] = useState(() => {
-    if (typeof window === 'undefined') return 6
-    if (window.innerWidth <= 767) return 3
-    if (window.innerWidth <= 1023) return 4
-    return 6
-  })
+    if (typeof window === "undefined") return 6;
+    if (window.innerWidth <= 767) return 3;
+    if (window.innerWidth <= 1023) return 4;
+    return 6;
+  });
 
   useEffect(() => {
     const updateEventsPerPage = () => {
       const nextPageSize =
-        window.innerWidth <= 767
-          ? 3
-          : window.innerWidth <= 1023
-            ? 4
-            : 6
+        window.innerWidth <= 767 ? 3 : window.innerWidth <= 1023 ? 4 : 6;
 
       setEventsPerPage((current) =>
         current === nextPageSize ? current : nextPageSize,
-      )
-    }
+      );
+    };
 
-    updateEventsPerPage()
-    window.addEventListener('resize', updateEventsPerPage)
+    updateEventsPerPage();
+    window.addEventListener("resize", updateEventsPerPage);
 
     return () => {
-      window.removeEventListener('resize', updateEventsPerPage)
-    }
-  }, [])
+      window.removeEventListener("resize", updateEventsPerPage);
+    };
+  }, []);
 
-  const [form, setForm] = useState<ProfileForm>(emptyForm)
-  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>('+49')
-  const [isLanguagesOpen, setIsLanguagesOpen] = useState(false)
-  const languagesDropdownRef = useRef<HTMLDivElement>(null)
+  const [form, setForm] = useState<ProfileForm>(emptyForm);
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("+49");
+  const [isLanguagesOpen, setIsLanguagesOpen] = useState(false);
+  const languagesDropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedLanguages = form.languages
-    .split(',')
+    .split(",")
     .map((language) => language.trim())
-    .filter(Boolean)
+    .filter(Boolean);
 
   const toggleLanguage = (language: string) => {
     const nextLanguages = selectedLanguages.includes(language)
       ? selectedLanguages.filter((item) => item !== language)
-      : [...selectedLanguages, language]
+      : [...selectedLanguages, language];
 
     setForm({
       ...form,
-      languages: nextLanguages.join(', '),
-    })
-  }
+      languages: nextLanguages.join(", "),
+    });
+  };
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  const availableCities = getCities(form.bundesland)
+  const availableCities = getCities(form.bundesland);
 
-  const avatarInputRef = useRef<HTMLInputElement>(null)
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     async function loadPage() {
-      setIsLoading(true)
-      setError('')
+      setIsLoading(true);
+      setError("");
 
       try {
-        const userProfile = await getProfile()
+        const userProfile = await getProfile();
 
         if (isActive) {
-          setProfile(userProfile)
-          setForm(toForm(userProfile))
-          setPhoneCountry(getPhoneCountry(userProfile.phone ?? ''))
-          setAvatarPreview(userProfile.avatarUrl ?? null)
+          setProfile(userProfile);
+          setForm(toForm(userProfile));
+          setPhoneCountry(getPhoneCountry(userProfile.phone ?? ""));
+          setAvatarPreview(userProfile.avatarUrl ?? null);
         }
       } catch (loadError) {
         if (isActive) {
           setError(
             loadError instanceof Error
               ? loadError.message
-              : 'Failed to load your profile.',
-          )
+              : "Failed to load your profile.",
+          );
         }
       }
 
       try {
-        const eventData = await getMyEvents()
+        const eventData = await getMyEvents();
 
         if (isActive) {
-          setEvents(eventData)
+          setEvents(eventData);
         }
       } catch (eventError) {
         if (isActive) {
           setError(
             eventError instanceof Error
               ? eventError.message
-              : 'Failed to load your events.',
-          )
+              : "Failed to load your events.",
+          );
         }
       }
 
       try {
-        const attendingEventData = await getAttendingEvents()
+        const attendingEventData = await getAttendingEvents();
 
         if (isActive) {
-          setAttendingEvents(attendingEventData)
+          setAttendingEvents(attendingEventData);
         }
       } catch (attendingError) {
         if (isActive) {
           setError(
             attendingError instanceof Error
               ? attendingError.message
-              : 'Failed to load attending events.',
-          )
+              : "Failed to load attending events.",
+          );
         }
       }
       if (isActive) {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    void loadPage()
+    void loadPage();
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (avatarPreview?.startsWith('blob:')) {
-        URL.revokeObjectURL(avatarPreview)
+      if (avatarPreview?.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarPreview);
       }
-    }
-  }, [avatarPreview])
+    };
+  }, [avatarPreview]);
 
   const openEditor = () => {
     if (profile) {
-      setForm(toForm(profile))
-      setPhoneCountry(getPhoneCountry(profile.phone ?? ''))
+      setForm(toForm(profile));
+      setPhoneCountry(getPhoneCountry(profile.phone ?? ""));
     }
 
-    setError('')
-    setSuccess('')
-    setIsEditing(true)
-  }
+    setError("");
+    setSuccess("");
+    setIsEditing(true);
+  };
 
   const closeEditor = () => {
     if (profile) {
-      setForm(toForm(profile))
-      setPhoneCountry(getPhoneCountry(profile.phone ?? ''))
-      setAvatarPreview(profile.avatarUrl ?? null)
+      setForm(toForm(profile));
+      setPhoneCountry(getPhoneCountry(profile.phone ?? ""));
+      setAvatarPreview(profile.avatarUrl ?? null);
     }
 
-    setIsEditing(false)
-    setError('')
-  }
+    setIsEditing(false);
+    setError("");
+  };
 
-  
-  const handleAvatarChange = async (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = event.target.files?.[0]
+  const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
 
-    if (!file) return
+    if (!file) return;
 
-    event.target.value = ''
+    event.target.value = "";
 
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setError('Please select a JPG, PNG, or WebP image.')
-      return
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Please select a JPG, PNG, or WebP image.");
+      return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('The image must be smaller than 5 MB.')
-      return
+      setError("The image must be smaller than 5 MB.");
+      return;
     }
 
-    const previousAvatar = profile?.avatarUrl ?? null
-    const previewUrl = URL.createObjectURL(file)
+    const previousAvatar = profile?.avatarUrl ?? null;
+    const previewUrl = URL.createObjectURL(file);
 
-    setAvatarPreview(previewUrl)
-    setError('')
-    setSuccess('')
+    setAvatarPreview(previewUrl);
+    setError("");
+    setSuccess("");
 
     try {
-      const savedProfile = await uploadAvatar(file)
+      const savedProfile = await uploadAvatar(file);
 
-      setProfile(savedProfile)
-      setAvatarPreview(savedProfile.avatarUrl ?? null)
+      setProfile(savedProfile);
+      setAvatarPreview(savedProfile.avatarUrl ?? null);
 
-      await refreshUser()
+      await refreshUser();
 
-      setSuccess('Profile photo updated successfully.')
+      setSuccess("Profile photo updated successfully.");
     } catch (uploadError) {
-      setAvatarPreview(previousAvatar)
+      setAvatarPreview(previousAvatar);
       setError(
         uploadError instanceof Error
           ? uploadError.message
-          : 'Failed to upload profile photo.',
-      )
+          : "Failed to upload profile photo.",
+      );
     } finally {
-      URL.revokeObjectURL(previewUrl)
+      URL.revokeObjectURL(previewUrl);
     }
-  }
-  
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  };
 
-    const phoneDigits = getPhoneDigits(form.phone, phoneCountry)
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const phoneDigits = getPhoneDigits(form.phone, phoneCountry);
 
     if (
       phoneDigits.length > 0 &&
-      phoneDigits.length !== (phoneCountry === '+380' ? 9 : 11)
+      phoneDigits.length !== (phoneCountry === "+380" ? 9 : 11)
     ) {
       setError(
-        phoneCountry === '+380'
-          ? 'Please enter a valid Ukrainian phone number with 9 digits.'
-          : 'Please enter a valid German phone number with 11 digits.',
-      )
-      return
+        phoneCountry === "+380"
+          ? "Please enter a valid Ukrainian phone number with 9 digits."
+          : "Please enter a valid German phone number with 11 digits.",
+      );
+      return;
     }
 
-    setIsSaving(true)
-    setError('')
-    setSuccess('')
+    setIsSaving(true);
+    setError("");
+    setSuccess("");
 
     try {
       const savedProfile = await updateProfile({
@@ -372,82 +370,76 @@ function ProfilePage() {
         bio: form.bio,
         phone: form.phone,
         languages: form.languages
-          .split(',')
+          .split(",")
           .map((language) => language.trim())
           .filter(Boolean),
-      })
+      });
 
-      const finalProfile = savedProfile
+      const finalProfile = savedProfile;
 
-      setProfile(finalProfile)
-      setForm(toForm(finalProfile))
-      setAvatarPreview(finalProfile.avatarUrl ?? null)
-      await refreshUser()
-      setIsEditing(false)
-      setSuccess('Your profile has been saved.')
+      setProfile(finalProfile);
+      setForm(toForm(finalProfile));
+      setAvatarPreview(finalProfile.avatarUrl ?? null);
+      await refreshUser();
+      setIsEditing(false);
+      setSuccess("Your profile has been saved.");
     } catch (saveError) {
       setError(
         saveError instanceof Error
           ? saveError.message
-          : 'Failed to save your profile.',
-      )
+          : "Failed to save your profile.",
+      );
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleLogout = async () => {
     try {
-      await logout()
-      window.location.assign('/')
+      await logout();
+      window.location.assign("/");
     } catch (error) {
-      console.error('Failed to log out:', error)
-      setError('Failed to log out. Please try again.')
+      console.error("Failed to log out:", error);
+      setError("Failed to log out. Please try again.");
     }
-  }
+  };
 
-  
   const visibleEvents =
-    activeEventsTab === 'attending' ? attendingEvents : events
+    activeEventsTab === "attending" ? attendingEvents : events;
 
-  const totalEventsPages = Math.ceil(
-    visibleEvents.length / eventsPerPage,
-  )
+  const totalEventsPages = Math.ceil(visibleEvents.length / eventsPerPage);
 
-  const currentEventsPage = Math.min(
-    eventsPage,
-    Math.max(totalEventsPages, 1),
-  )
+  const currentEventsPage = Math.min(eventsPage, Math.max(totalEventsPages, 1));
 
   useEffect(() => {
     eventsSectionRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }, [currentEventsPage])
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [currentEventsPage]);
 
   const paginatedEvents = visibleEvents.slice(
     (currentEventsPage - 1) * eventsPerPage,
     currentEventsPage * eventsPerPage,
-  )
+  );
 
   const fullName = profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
-    : ''
+    : "";
 
   const initials =
-    `${profile?.firstName.charAt(0) ?? ''}${profile?.lastName.charAt(0) ?? ''}`.toUpperCase()
+    `${profile?.firstName.charAt(0) ?? ""}${profile?.lastName.charAt(0) ?? ""}`.toUpperCase();
 
   const location = [profile?.city, profile?.bundesland]
     .filter(Boolean)
-    .join(', ')
+    .join(", ");
 
   const joinedDate = profile
     ? new Date(profile.createdAt).toLocaleDateString(undefined, {
-        month: 'short',
-        year: 'numeric',
+        month: "short",
+        year: "numeric",
       })
-    : ''
+    : "";
 
   if (isLoading) {
     return (
@@ -456,7 +448,7 @@ function ProfilePage() {
           <p>Loading your profile…</p>
         </div>
       </main>
-    )
+    );
   }
 
   if (!profile) {
@@ -467,12 +459,12 @@ function ProfilePage() {
             className="profile-page__notice profile-page__notice--error"
             role="alert"
           >
-            {error || 'Could not load your profile.'}
+            {error || "Could not load your profile."}
           </p>
           <a href="/login">Sign in</a>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -500,11 +492,11 @@ function ProfilePage() {
               <button
                 type="button"
                 className={`profile-page__theme-toggle ${
-                  theme === 'dark' ? 'profile-page__theme-toggle--dark' : ''
+                  theme === "dark" ? "profile-page__theme-toggle--dark" : ""
                 }`}
                 onClick={toggleTheme}
                 aria-label="Toggle dark theme"
-                aria-pressed={theme === 'dark'}
+                aria-pressed={theme === "dark"}
               >
                 <span className="profile-page__theme-icon" aria-hidden="true">
                   ☼
@@ -568,9 +560,7 @@ function ProfilePage() {
                     alt={`${fullName} avatar`}
                   />
                 ) : (
-                  <div className="profile-page__avatar">
-                    {initials || '?'}
-                  </div>
+                  <div className="profile-page__avatar">{initials || "?"}</div>
                 )}
 
                 <input
@@ -594,11 +584,11 @@ function ProfilePage() {
               </div>
 
               <div className="profile-page__identity">
-                <h1>{fullName || 'Your profile'}</h1>
+                <h1>{fullName || "Your profile"}</h1>
 
                 <p>
                   <span aria-hidden="true">📍</span>
-                  {location || 'Location not added yet'}
+                  {location || "Location not added yet"}
                 </p>
               </div>
 
@@ -621,25 +611,25 @@ function ProfilePage() {
                 </div>
 
                 <p className="profile-page__about-text">
-                  {profile.bio?.trim() || 'Not added yet.'}
+                  {profile.bio?.trim() || "Not added yet."}
                 </p>
 
                 <div className="profile-page__about-meta">
                   <span>
                     <strong aria-hidden="true">📍</strong>
-                    {location || '—'}
+                    {location || "—"}
                   </span>
 
                   <span>
                     <strong aria-hidden="true">文</strong>
                     {profile.languages.length
-                      ? profile.languages.join(', ')
-                      : 'Not added yet'}
+                      ? profile.languages.join(", ")
+                      : "Not added yet"}
                   </span>
 
                   <span>
                     <strong aria-hidden="true">▣</strong>
-                    Joined UAround: {joinedDate || '—'}
+                    Joined UAround: {joinedDate || "—"}
                   </span>
                 </div>
               </section>
@@ -657,13 +647,13 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={`profile-page__tab ${
-                      activeEventsTab === 'attending'
-                        ? 'profile-page__tab--active'
-                        : ''
+                      activeEventsTab === "attending"
+                        ? "profile-page__tab--active"
+                        : ""
                     }`}
                     onClick={() => {
-                      setActiveEventsTab('attending')
-                      setEventsPage(1)
+                      setActiveEventsTab("attending");
+                      setEventsPage(1);
                     }}
                   >
                     Attending
@@ -672,13 +662,13 @@ function ProfilePage() {
                   <button
                     type="button"
                     className={`profile-page__tab ${
-                      activeEventsTab === 'organizing'
-                        ? 'profile-page__tab--active'
-                        : ''
+                      activeEventsTab === "organizing"
+                        ? "profile-page__tab--active"
+                        : ""
                     }`}
                     onClick={() => {
-                      setActiveEventsTab('organizing')
-                      setEventsPage(1)
+                      setActiveEventsTab("organizing");
+                      setEventsPage(1);
                     }}
                   >
                     Organizing
@@ -747,11 +737,11 @@ function ProfilePage() {
                             type="button"
                             className={`profile-page__pagination-button ${
                               currentEventsPage === page
-                                ? 'profile-page__pagination-button--active'
-                                : ''
+                                ? "profile-page__pagination-button--active"
+                                : ""
                             }`}
                             aria-current={
-                              currentEventsPage === page ? 'page' : undefined
+                              currentEventsPage === page ? "page" : undefined
                             }
                             onClick={() => setEventsPage(page)}
                           >
@@ -773,7 +763,7 @@ function ProfilePage() {
                   </>
                 ) : (
                   <p>
-                    {activeEventsTab === 'attending'
+                    {activeEventsTab === "attending"
                       ? "You haven't registered for any events yet."
                       : "You haven't created any events yet."}
                   </p>
@@ -789,12 +779,12 @@ function ProfilePage() {
                 <div className="profile-page__account-list">
                   <div>
                     <span aria-hidden="true">✉</span>
-                    <p>{profile.email || '—'}</p>
+                    <p>{profile.email || "—"}</p>
                   </div>
 
                   <div>
                     <span aria-hidden="true">☎</span>
-                    <p>{profile.phone || 'Not added yet'}</p>
+                    <p>{profile.phone || "Not added yet"}</p>
                   </div>
                 </div>
               </section>
@@ -809,7 +799,7 @@ function ProfilePage() {
                     <span aria-hidden="true">📍</span>
                     <span>
                       <strong>Location</strong>
-                      <small>{location || 'Not added yet'}</small>
+                      <small>{location || "Not added yet"}</small>
                     </span>
                   </div>
 
@@ -819,8 +809,8 @@ function ProfilePage() {
                       <strong>Languages</strong>
                       <small>
                         {profile.languages.length
-                          ? profile.languages.join(', ')
-                          : 'Not added yet'}
+                          ? profile.languages.join(", ")
+                          : "Not added yet"}
                       </small>
                     </span>
                   </div>
@@ -829,9 +819,7 @@ function ProfilePage() {
               <section className="profile-page__danger">
                 <h2>Danger zone</h2>
 
-                <p>
-                  Deleting your account is permanent and cannot be undone.
-                </p>
+                <p>Deleting your account is permanent and cannot be undone.</p>
 
                 <button
                   type="button"
@@ -854,7 +842,7 @@ function ProfilePage() {
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
-              closeEditor()
+              closeEditor();
             }
           }}
         >
@@ -911,14 +899,14 @@ function ProfilePage() {
                     required
                     value={form.bundesland}
                     onChange={(event) => {
-                      const newBundesland = event.target.value
-                      const newCities = getCities(newBundesland)
+                      const newBundesland = event.target.value;
+                      const newCities = getCities(newBundesland);
 
                       setForm({
                         ...form,
                         bundesland: newBundesland,
-                        city: newCities[0] ?? '',
-                      })
+                        city: newCities[0] ?? "",
+                      });
                     }}
                   >
                     {bundeslaender.map((bundesland) => (
@@ -952,7 +940,6 @@ function ProfilePage() {
                   </select>
                 </label>
 
-                
                 <div className="profile-editor__full profile-editor__phone">
                   <span className="profile-editor__field-label">Phone</span>
 
@@ -961,15 +948,15 @@ function ProfilePage() {
                       aria-label="Phone country code"
                       value={phoneCountry}
                       onChange={(event) => {
-                        const country = event.target.value as PhoneCountry
-                        const digits = getPhoneDigits(form.phone, phoneCountry)
+                        const country = event.target.value as PhoneCountry;
+                        const digits = getPhoneDigits(form.phone, phoneCountry);
 
-                        setPhoneCountry(country)
+                        setPhoneCountry(country);
                         setForm({
                           ...form,
                           phone: formatStoredPhone(country, digits),
-                        })
-                        setError('')
+                        });
+                        setError("");
                       }}
                     >
                       <option value="+380">🇺🇦 +380</option>
@@ -985,18 +972,18 @@ function ProfilePage() {
                         phoneCountry,
                       )}
                       onChange={(event) => {
-                        const digits = event.target.value.replace(/\D/g, '')
+                        const digits = event.target.value.replace(/\D/g, "");
 
                         setForm({
                           ...form,
                           phone: formatStoredPhone(phoneCountry, digits),
-                        })
-                        setError('')
+                        });
+                        setError("");
                       }}
                       placeholder={
-                        phoneCountry === '+380'
-                          ? 'XX-XXX-XXXX'
-                          : 'XXX-XXX-XX-XXX'
+                        phoneCountry === "+380"
+                          ? "XX-XXX-XXXX"
+                          : "XXX-XXX-XX-XXX"
                       }
                       aria-label="Phone number"
                       aria-describedby="profile-phone-hint"
@@ -1004,12 +991,11 @@ function ProfilePage() {
                   </div>
 
                   <small id="profile-phone-hint">
-                    {phoneCountry === '+380'
-                      ? 'Enter 9 digits after +380.'
-                      : 'Enter 11 digits after +49.'}
+                    {phoneCountry === "+380"
+                      ? "Enter 9 digits after +380."
+                      : "Enter 11 digits after +49."}
                   </small>
                 </div>
-
 
                 <label className="profile-editor__full">
                   About me
@@ -1047,17 +1033,17 @@ function ProfilePage() {
                         selectedLanguages.map((language) => {
                           const item = AVAILABLE_LANGUAGES.find(
                             (option) => option.name === language,
-                          )
+                          );
 
                           return (
                             <span
                               key={language}
                               className="profile-editor__language-tag"
                             >
-                              {item?.flag ?? '🌐'} {language}
+                              {item?.flag ?? "🌐"} {language}
                               <span aria-hidden="true">×</span>
                             </span>
-                          )
+                          );
                         })
                       ) : (
                         <span className="profile-editor__languages-placeholder">
@@ -1068,7 +1054,9 @@ function ProfilePage() {
 
                     <span
                       className={`profile-editor__languages-arrow ${
-                        isLanguagesOpen ? 'profile-editor__languages-arrow--open' : ''
+                        isLanguagesOpen
+                          ? "profile-editor__languages-arrow--open"
+                          : ""
                       }`}
                       aria-hidden="true"
                     >
@@ -1084,7 +1072,9 @@ function ProfilePage() {
                       aria-multiselectable="true"
                     >
                       {AVAILABLE_LANGUAGES.map((language) => {
-                        const isSelected = selectedLanguages.includes(language.name)
+                        const isSelected = selectedLanguages.includes(
+                          language.name,
+                        );
 
                         return (
                           <button
@@ -1094,8 +1084,8 @@ function ProfilePage() {
                             aria-selected={isSelected}
                             className={`profile-editor__language-option ${
                               isSelected
-                                ? 'profile-editor__language-option--selected'
-                                : ''
+                                ? "profile-editor__language-option--selected"
+                                : ""
                             }`}
                             onClick={() => toggleLanguage(language.name)}
                           >
@@ -1109,24 +1099,26 @@ function ProfilePage() {
                             <span
                               className={`profile-editor__language-check ${
                                 isSelected
-                                  ? 'profile-editor__language-check--selected'
-                                  : ''
+                                  ? "profile-editor__language-check--selected"
+                                  : ""
                               }`}
                               aria-hidden="true"
                             >
-                              {isSelected ? '✓' : ''}
+                              {isSelected ? "✓" : ""}
                             </span>
                           </button>
-                        )
+                        );
                       })}
                     </div>
                   )}
 
                   <small>
                     {selectedLanguages.length === 0
-                      ? 'No languages selected.'
+                      ? "No languages selected."
                       : `${selectedLanguages.length} ${
-                          selectedLanguages.length === 1 ? 'language' : 'languages'
+                          selectedLanguages.length === 1
+                            ? "language"
+                            : "languages"
                         } selected`}
                   </small>
                 </div>
@@ -1142,16 +1134,12 @@ function ProfilePage() {
               )}
 
               <div className="profile-editor__actions">
-                <button
-                  type="button"
-                  onClick={closeEditor}
-                  disabled={isSaving}
-                >
+                <button type="button" onClick={closeEditor} disabled={isSaving}>
                   Cancel
                 </button>
 
                 <button type="submit" disabled={isSaving}>
-                  {isSaving ? 'Saving…' : 'Save changes'}
+                  {isSaving ? "Saving…" : "Save changes"}
                 </button>
               </div>
             </form>
@@ -1159,7 +1147,7 @@ function ProfilePage() {
         </div>
       )}
     </main>
-  )
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;

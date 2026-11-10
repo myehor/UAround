@@ -1,17 +1,17 @@
-import './Button.scss'
+import "./Button.scss";
 
 type ButtonProps = {
-  children: React.ReactNode
-  type?: 'button' | 'submit' | 'reset'
-  variant?: 'primary' | 'secondary' | 'destructive'
-  disabled?: boolean
-  onClick?: () => void
-}
+  children: React.ReactNode;
+  type?: "button" | "submit" | "reset";
+  variant?: "primary" | "secondary" | "destructive";
+  disabled?: boolean;
+  onClick?: () => void;
+};
 
 function Button({
   children,
-  type = 'button',
-  variant = 'primary',
+  type = "button",
+  variant = "primary",
   disabled = false,
   onClick,
 }: ButtonProps) {
@@ -24,7 +24,7 @@ function Button({
     >
       {children}
     </button>
-  )
+  );
 }
 
-export default Button
+export default Button;

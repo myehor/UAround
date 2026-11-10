@@ -1,68 +1,60 @@
+import { useEffect, useRef, useState } from "react";
+import Splide from "@splidejs/splide";
+import type { Options } from "@splidejs/splide";
 
-import { useEffect, useRef, useState } from 'react'
-import Splide from '@splidejs/splide'
-import type { Options } from '@splidejs/splide'
+import { getEvents } from "../../../api/events";
+import type { Event } from "../../../types/event";
 
-import { getEvents } from '../../../api/events'
-import type { Event } from '../../../types/event'
+import EventCard from "../EventCard/EventCard";
 
-import EventCard from '../EventCard/EventCard'
+import "@splidejs/splide/css";
+import "./PopularEvents.scss";
 
-import '@splidejs/splide/css'
-import './PopularEvents.scss'
-
-const MAX_POPULAR_EVENTS = 5
+const MAX_POPULAR_EVENTS = 5;
 
 function PopularEvents() {
-  const [events, setEvents] = useState<Event[]>([])
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [events, setEvents] = useState<Event[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  const sliderRef = useRef<HTMLDivElement | null>(null)
-  const splideRef = useRef<Splide | null>(null)
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const splideRef = useRef<Splide | null>(null);
 
   useEffect(() => {
-    let isActive = true
+    let isActive = true;
 
     const loadEvents = async () => {
       try {
-        const data = await getEvents()
+        const data = await getEvents();
 
         if (isActive) {
-          setEvents(data)
+          setEvents(data);
         }
       } catch (error) {
-        console.error('Failed to load popular events:', error)
+        console.error("Failed to load popular events:", error);
       }
-    }
+    };
 
-    void loadEvents()
+    void loadEvents();
 
     return () => {
-      isActive = false
-    }
-  }, [])
+      isActive = false;
+    };
+  }, []);
 
   const popularEvents = [...events]
     .sort(
       (firstEvent, secondEvent) =>
-        secondEvent.registeredCount -
-        firstEvent.registeredCount,
+        secondEvent.registeredCount - firstEvent.registeredCount,
     )
-    .slice(0, MAX_POPULAR_EVENTS)
+    .slice(0, MAX_POPULAR_EVENTS);
 
   useEffect(() => {
-    if (
-      !sliderRef.current ||
-      popularEvents.length === 0
-    ) {
-      return
+    if (!sliderRef.current || popularEvents.length === 0) {
+      return;
     }
 
     const options: Options = {
-      type:
-        popularEvents.length > 1
-          ? 'loop'
-          : 'slide',
+      type: popularEvents.length > 1 ? "loop" : "slide",
       perPage: 1,
       perMove: 1,
       gap: 0,
@@ -73,52 +65,44 @@ function PopularEvents() {
       pauseOnHover: true,
       pauseOnFocus: true,
       speed: 700,
-    }
+    };
 
-    const splide = new Splide(
-      sliderRef.current,
-      options,
-    )
+    const splide = new Splide(sliderRef.current, options);
 
-    splide.on('move', (newIndex) => {
-      setActiveIndex(newIndex)
-    })
+    splide.on("move", (newIndex) => {
+      setActiveIndex(newIndex);
+    });
 
-    splide.mount()
+    splide.mount();
 
-    splideRef.current = splide
+    splideRef.current = splide;
 
     return () => {
-      splide.destroy()
-      splideRef.current = null
-    }
-  }, [popularEvents.length])
+      splide.destroy();
+      splideRef.current = null;
+    };
+  }, [popularEvents.length]);
 
   const goToSlide = (index: number) => {
-    splideRef.current?.go(index)
-  }
+    splideRef.current?.go(index);
+  };
 
   if (popularEvents.length === 0) {
-    return null
+    return null;
   }
 
   return (
     <section className="popular-events">
       <div className="popular-events__header">
         <div>
-          <p className="popular-events__eyebrow">
-            Popular Events
-          </p>
+          <p className="popular-events__eyebrow">Popular Events</p>
 
           <h2 className="popular-events__title">
             Most popular events in Bayern right now
           </h2>
         </div>
 
-        <a
-          className="popular-events__view-all"
-          href="/events"
-        >
+        <a className="popular-events__view-all" href="/events">
           View all
           <span aria-hidden="true">→</span>
         </a>
@@ -132,15 +116,9 @@ function PopularEvents() {
         <div className="splide__track">
           <ul className="splide__list">
             {popularEvents.map((event) => (
-              <li
-                key={event.id}
-                className="splide__slide"
-              >
+              <li key={event.id} className="splide__slide">
                 <div className="popular-events__featured">
-                  <EventCard
-                    event={event}
-                    variant="featured"
-                  />
+                  <EventCard event={event} variant="featured" />
                 </div>
               </li>
             ))}
@@ -155,12 +133,11 @@ function PopularEvents() {
               key={event.id}
               type="button"
               className={[
-                'popular-events__preview',
-                index === activeIndex &&
-                  'popular-events__preview--active',
+                "popular-events__preview",
+                index === activeIndex && "popular-events__preview--active",
               ]
                 .filter(Boolean)
-                .join(' ')}
+                .join(" ")}
               onClick={() => goToSlide(index)}
               aria-label={`Show ${event.title}`}
             >
@@ -169,8 +146,7 @@ function PopularEvents() {
                   src={event.imageUrl}
                   alt=""
                   onError={(imageEvent) => {
-                    imageEvent.currentTarget.style.display =
-                      'none'
+                    imageEvent.currentTarget.style.display = "none";
                   }}
                 />
               </div>
@@ -193,7 +169,7 @@ function PopularEvents() {
         </div>
       )}
     </section>
-  )
+  );
 }
 
-export default PopularEvents
+export default PopularEvents;

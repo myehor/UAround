@@ -1,19 +1,9 @@
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { getCurrentUser, logoutUser, type AuthUser } from "../api/auth";
 
-import {
-  getCurrentUser,
-  logoutUser,
-  type AuthUser,
-} from '../api/auth';
-
-import { AuthContext } from './auth-context';
-import { useTheme } from './useTheme';
+import { AuthContext } from "./auth-context";
+import { useTheme } from "./useTheme";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -29,7 +19,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.error('Failed to load current user:', error);
+      console.error("Failed to load current user:", error);
       setUser(null);
     }
   }, []);
@@ -45,7 +35,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setUser(currentUser);
         }
       } catch (error) {
-        console.error('Failed to restore session:', error);
+        console.error("Failed to restore session:", error);
 
         if (isMounted) {
           setUser(null);

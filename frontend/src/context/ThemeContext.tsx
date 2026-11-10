@@ -1,41 +1,36 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
-import { ThemeContext, type Theme } from './theme-context'
+import { ThemeContext, type Theme } from "./theme-context";
 
 interface ThemeProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 function getInitialTheme(): Theme {
-  const savedTheme = sessionStorage.getItem('uaround-theme')
+  const savedTheme = sessionStorage.getItem("uaround-theme");
 
-  return savedTheme === 'dark' ? 'dark' : 'light'
+  return savedTheme === "dark" ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   const toggleTheme = useCallback(() => {
-    setTheme((current) => (current === 'light' ? 'dark' : 'light'))
-  }, [])
+    setTheme((current) => (current === "light" ? "dark" : "light"));
+  }, []);
 
   const resetTheme = useCallback(() => {
-    setTheme('light')
-  }, [])
+    setTheme("light");
+  }, []);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    sessionStorage.setItem('uaround-theme', theme)
-  }, [theme])
+    document.documentElement.dataset.theme = theme;
+    sessionStorage.setItem("uaround-theme", theme);
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, resetTheme }}>
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }

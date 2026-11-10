@@ -1,12 +1,12 @@
-import type { ReactNode } from 'react'
-import './Container.scss'
+import type { ReactNode } from "react";
+import "./Container.scss";
 
 type ContainerProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 function Container({ children }: ContainerProps) {
-  return <div className="container">{children}</div>
+  return <div className="container">{children}</div>;
 }
 
-export default Container
+export default Container;

@@ -1,12 +1,12 @@
-import { Router } from 'express';
-import { z } from 'zod';
+import { Router } from "express";
+import { z } from "zod";
 
-import { prisma } from './lib/prisma.js';
+import { prisma } from "./lib/prisma.js";
 
-import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { randomUUID } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const router = Router();
 
@@ -38,9 +38,9 @@ const updateProfileSchema = z.object({
   languages: z.array(z.string().trim().min(1).max(40)).max(12).optional(),
 });
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   if (!req.session.userId) {
-    res.status(401).json({ message: 'Please sign in to view your profile.' });
+    res.status(401).json({ message: "Please sign in to view your profile." });
     return;
   }
 
@@ -51,23 +51,23 @@ router.get('/', async (req, res) => {
     });
 
     if (!user) {
-      res.status(401).json({ message: 'User account was not found.' });
+      res.status(401).json({ message: "User account was not found." });
       return;
     }
 
     res.json({ user });
   } catch (error) {
-    console.error('Failed to load profile:', error);
-    res.status(500).json({ message: 'Failed to load profile.' });
+    console.error("Failed to load profile:", error);
+    res.status(500).json({ message: "Failed to load profile." });
   }
 });
 
-router.post('/avatar', async (req, res) => {
+router.post("/avatar", async (req, res) => {
   try {
     const userId = req.session.userId;
 
     if (!userId) {
-      res.status(401).json({ message: 'Unauthorized' });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -78,7 +78,7 @@ router.post('/avatar', async (req, res) => {
     const parsed = schema.safeParse(req.body);
 
     if (!parsed.success) {
-      res.status(400).json({ message: 'Invalid image data' });
+      res.status(400).json({ message: "Invalid image data" });
       return;
     }
 
@@ -87,26 +87,23 @@ router.post('/avatar', async (req, res) => {
     );
 
     if (!match) {
-      res.status(400).json({ message: 'Unsupported image format' });
+      res.status(400).json({ message: "Unsupported image format" });
       return;
     }
 
-    const extension = match[1] === 'jpeg' ? 'jpg' : match[1];
-    const imageBuffer = Buffer.from(match[2], 'base64');
+    const extension = match[1] === "jpeg" ? "jpg" : match[1];
+    const imageBuffer = Buffer.from(match[2], "base64");
 
-    if (
-      imageBuffer.length === 0 ||
-      imageBuffer.length > 5 * 1024 * 1024
-    ) {
-      res.status(400).json({ message: 'Image must be no larger than 5 MB' });
+    if (imageBuffer.length === 0 || imageBuffer.length > 5 * 1024 * 1024) {
+      res.status(400).json({ message: "Image must be no larger than 5 MB" });
       return;
     }
 
     const uploadsDir = path.resolve(
       path.dirname(fileURLToPath(import.meta.url)),
-      '..',
-      'uploads',
-      'avatars',
+      "..",
+      "uploads",
+      "avatars",
     );
 
     await mkdir(uploadsDir, { recursive: true });
@@ -123,18 +120,18 @@ router.post('/avatar', async (req, res) => {
     });
 
     res.json({
-      message: 'Avatar uploaded successfully',
+      message: "Avatar uploaded successfully",
       user,
     });
   } catch (error) {
-    console.error('Avatar upload failed:', error);
-    res.status(500).json({ message: 'Failed to upload avatar' });
+    console.error("Avatar upload failed:", error);
+    res.status(500).json({ message: "Failed to upload avatar" });
   }
 });
 
-router.patch('/', async (req, res) => {
+router.patch("/", async (req, res) => {
   if (!req.session.userId) {
-    res.status(401).json({ message: 'Please sign in to edit your profile.' });
+    res.status(401).json({ message: "Please sign in to edit your profile." });
     return;
   }
 
@@ -142,9 +139,9 @@ router.patch('/', async (req, res) => {
 
   if (!validation.success) {
     res.status(400).json({
-      message: 'Please check the profile data.',
+      message: "Please check the profile data.",
       errors: validation.error.issues.map((issue) => ({
-        field: issue.path.join('.'),
+        field: issue.path.join("."),
         message: issue.message,
       })),
     });
@@ -152,7 +149,7 @@ router.patch('/', async (req, res) => {
   }
 
   if (Object.keys(validation.data).length === 0) {
-    res.status(400).json({ message: 'No profile changes were provided.' });
+    res.status(400).json({ message: "No profile changes were provided." });
     return;
   }
 
@@ -163,7 +160,7 @@ router.patch('/', async (req, res) => {
     });
 
     if (!currentUser) {
-      res.status(401).json({ message: 'User account was not found.' });
+      res.status(401).json({ message: "User account was not found." });
       return;
     }
 
@@ -180,7 +177,7 @@ router.patch('/', async (req, res) => {
     });
 
     if (!existingUser) {
-      res.status(401).json({ message: 'User account was not found.' });
+      res.status(401).json({ message: "User account was not found." });
       return;
     }
 
@@ -203,10 +200,10 @@ router.patch('/', async (req, res) => {
       select: profileSelect,
     });
 
-    res.json({ message: 'Profile saved successfully.', user });
+    res.json({ message: "Profile saved successfully.", user });
   } catch (error) {
-    console.error('Failed to update profile:', error);
-    res.status(500).json({ message: 'Failed to save profile.' });
+    console.error("Failed to update profile:", error);
+    res.status(500).json({ message: "Failed to save profile." });
   }
 });
 

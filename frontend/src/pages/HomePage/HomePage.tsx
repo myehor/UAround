@@ -1,12 +1,12 @@
-import Container from '../../components/layout/Container/Container'
-import PopularEvents from '../../components/event/PopularEvents/PopularEvents'
-import CommunityAction from '../../components/home/CommunityAction/CommunityAction'
-import EventsNearYou from '../../components/home/EventsNearYou/EventsNearYou'
-import CommunityImpact from '../../components/home/CommunityImpact/CommunityImpact'
-import BundeslandEvents from '../../components/home/BundeslandEvents/BundeslandEvents'
-import heroImage from '../../assets/images/hero-city.png'
+import Container from "../../components/layout/Container/Container";
+import PopularEvents from "../../components/event/PopularEvents/PopularEvents";
+import CommunityAction from "../../components/home/CommunityAction/CommunityAction";
+import EventsNearYou from "../../components/home/EventsNearYou/EventsNearYou";
+import CommunityImpact from "../../components/home/CommunityImpact/CommunityImpact";
+import BundeslandEvents from "../../components/home/BundeslandEvents/BundeslandEvents";
+import heroImage from "../../assets/images/hero-city.png";
 
-import './HomePage.scss'
+import "./HomePage.scss";
 
 function HomePage() {
   return (
@@ -22,9 +22,7 @@ function HomePage() {
             <div className="home-page__hero-overlay" />
 
             <div className="home-page__hero-content">
-              <p className="home-page__eyebrow">
-                Ukrainian events around you
-              </p>
+              <p className="home-page__eyebrow">Ukrainian events around you</p>
 
               <h1>
                 Find Ukrainian events
@@ -38,14 +36,8 @@ function HomePage() {
                 and across your Bundesland.
               </p>
 
-              <button
-                type="button"
-                className="home-page__location"
-              >
-                <span
-                  className="home-page__location-icon"
-                  aria-hidden="true"
-                >
+              <button type="button" className="home-page__location">
+                <span className="home-page__location-icon" aria-hidden="true">
                   ●
                 </span>
 
@@ -68,7 +60,7 @@ function HomePage() {
         </Container>
       </section>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

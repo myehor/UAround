@@ -1,22 +1,22 @@
-import type { ChangeEvent } from 'react'
-import './Select.scss'
+import type { ChangeEvent } from "react";
+import "./Select.scss";
 
 type SelectOption = {
-  value: string
-  label: string
-}
+  value: string;
+  label: string;
+};
 
 type SelectProps = {
-  id: string
-  label: string
-  options: SelectOption[]
-  value: string
-  placeholder?: string
-  required?: boolean
-  disabled?: boolean
-  error?: string
-  onChange: (event: ChangeEvent<HTMLSelectElement>) => void
-}
+  id: string;
+  label: string;
+  options: SelectOption[];
+  value: string;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  error?: string;
+  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+};
 
 function Select({
   id,
@@ -38,7 +38,7 @@ function Select({
 
       <select
         id={id}
-        className={`select__field${error ? ' select__field--error' : ''}`}
+        className={`select__field${error ? " select__field--error" : ""}`}
         value={value}
         required={required}
         disabled={disabled}
@@ -65,7 +65,7 @@ function Select({
         </p>
       )}
     </div>
-  )
+  );
 }
 
-export default Select
+export default Select;

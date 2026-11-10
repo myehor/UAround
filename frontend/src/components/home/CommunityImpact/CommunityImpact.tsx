@@ -1,4 +1,4 @@
-import './CommunityImpact.scss'
+import "./CommunityImpact.scss";
 
 function CommunityImpact() {
   return (
@@ -6,9 +6,7 @@ function CommunityImpact() {
       <div className="community-impact__decor community-impact__decor--left" />
 
       <div className="community-impact__content">
-        <p className="community-impact__eyebrow">
-          OUR COMMUNITY
-        </p>
+        <p className="community-impact__eyebrow">OUR COMMUNITY</p>
 
         <h2 className="community-impact__title">
           A growing community
@@ -25,9 +23,7 @@ function CommunityImpact() {
 
       <div className="community-impact__stats">
         <div className="community-impact__stat">
-          <div className="community-impact__stat-icon">
-            ♟
-          </div>
+          <div className="community-impact__stat-icon">♟</div>
 
           <strong>2,500+</strong>
 
@@ -35,9 +31,7 @@ function CommunityImpact() {
         </div>
 
         <div className="community-impact__stat">
-          <div className="community-impact__stat-icon">
-            ▣
-          </div>
+          <div className="community-impact__stat-icon">▣</div>
 
           <strong>320+</strong>
 
@@ -45,9 +39,7 @@ function CommunityImpact() {
         </div>
 
         <div className="community-impact__stat">
-          <div className="community-impact__stat-icon">
-            ●
-          </div>
+          <div className="community-impact__stat-icon">●</div>
 
           <strong>15+</strong>
 
@@ -76,7 +68,7 @@ function CommunityImpact() {
 
       <div className="community-impact__decor community-impact__decor--bottom" />
     </section>
-  )
+  );
 }
 
-export default CommunityImpact
+export default CommunityImpact;

@@ -213,7 +213,6 @@
   }
 }
 
-
 .event-card__register--cancel {
   background: #dc3545;
 }
@@ -233,7 +232,7 @@
 }
 
 // Dark theme
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   .event-card {
     background: var(--color-surface);
     border-color: var(--color-border);

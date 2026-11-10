@@ -1,26 +1,19 @@
-import './EventResultsToolbar.scss'
+import "./EventResultsToolbar.scss";
 
-export type EventSortOption =
-  | 'soonest'
-  | 'latest'
-  | 'popular'
-  | 'newest'
+export type EventSortOption = "soonest" | "latest" | "popular" | "newest";
 
 type EventResultsToolbarProps = {
-  eventCount: number
-  selectedSort: EventSortOption
-  onSortChange: (
-    sort: EventSortOption,
-  ) => void
-}
+  eventCount: number;
+  selectedSort: EventSortOption;
+  onSortChange: (sort: EventSortOption) => void;
+};
 
 function EventResultsToolbar({
   eventCount,
   selectedSort,
   onSortChange,
 }: EventResultsToolbarProps) {
-  const eventLabel =
-    eventCount === 1 ? 'event' : 'events'
+  const eventLabel = eventCount === 1 ? "event" : "events";
 
   return (
     <div className="event-results-toolbar">
@@ -35,33 +28,20 @@ function EventResultsToolbar({
           <select
             value={selectedSort}
             onChange={(event) =>
-              onSortChange(
-                event.target.value as EventSortOption,
-              )
+              onSortChange(event.target.value as EventSortOption)
             }
           >
-            <option value="soonest">
-              Soonest
-            </option>
+            <option value="soonest">Soonest</option>
 
-            <option value="latest">
-              Latest
-            </option>
+            <option value="latest">Latest</option>
 
-            <option value="popular">
-              Most popular
-            </option>
+            <option value="popular">Most popular</option>
 
-            <option value="newest">
-              Newest
-            </option>
+            <option value="newest">Newest</option>
           </select>
         </label>
 
-        <div
-          className="event-results-toolbar__view"
-          aria-label="View mode"
-        >
+        <div className="event-results-toolbar__view" aria-label="View mode">
           <button
             type="button"
             className="event-results-toolbar__view-button event-results-toolbar__view-button--active"
@@ -139,7 +119,7 @@ function EventResultsToolbar({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default EventResultsToolbar
+export default EventResultsToolbar;
