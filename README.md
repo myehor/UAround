@@ -1,5 +1,7 @@
 # UAround
 
+🌐 **Live Demo:** [uaround.vercel.app](https://uaround.vercel.app)
+
 ### Discover events. Meet people. Feel connected.
 
 **UAround** is a community events platform designed for Ukrainians living in Germany. It helps people discover local activities, join events, and organize meetups based on shared interests.
