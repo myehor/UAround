@@ -9,6 +9,8 @@ export type AuthUser = {
   createdAt: string;
 };
 
+const API_URL = import.meta.env.VITE_API_URL ?? "";
+
 type AuthResponse = {
   message: string;
   user?: AuthUser;
@@ -36,7 +38,7 @@ export async function registerUser(payload: {
   bundesland: string;
   city: string;
 }): Promise<AuthResponse> {
-  const response = await fetch("/api/auth/register", {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -50,7 +52,7 @@ export async function loginUser(payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> {
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -61,7 +63,7 @@ export async function loginUser(payload: {
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
-  const response = await fetch("/api/auth/me", {
+  const response = await fetch(`${API_URL}/api/auth/me`, {
     credentials: "include",
   });
 
@@ -74,7 +76,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 }
 
 export async function logoutUser(): Promise<void> {
-  const response = await fetch("/api/auth/logout", {
+  const response = await fetch(`${API_URL}/api/auth/logout`, {
     method: "POST",
     credentials: "include",
   });
