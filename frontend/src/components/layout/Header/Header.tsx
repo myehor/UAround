@@ -10,7 +10,7 @@ function Header() {
   const { user, isLoading, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isHomeActive = pathname === "/";
+  const isHomeActive = pathname === "/home";
   const isEventsActive = pathname === "/events";
 
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() : "";
@@ -37,7 +37,7 @@ function Header() {
         <div className="header__inner">
           <a
             className="header__logo"
-            href="/"
+            href="/home"
             onClick={closeMobileMenu}
             aria-label="UAround — Home"
           >
@@ -52,7 +52,7 @@ function Header() {
               ]
                 .filter(Boolean)
                 .join(" ")}
-              href="/"
+              href="/home"
             >
               Home
             </a>
@@ -151,7 +151,7 @@ function Header() {
             ]
               .filter(Boolean)
               .join(" ")}
-            href="/"
+            href="/home"
             onClick={closeMobileMenu}
             tabIndex={isMobileMenuOpen ? 0 : -1}
           >
