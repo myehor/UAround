@@ -1,4 +1,5 @@
 import type { Event } from "../types/event";
+const API_URL = import.meta.env.VITE_API_URL ?? "";
 
 type EventsResponse = {
   message: string;
@@ -7,7 +8,7 @@ type EventsResponse = {
 };
 
 export async function getEvents(): Promise<Event[]> {
-  const response = await fetch("/api/events");
+  const response = await fetch(`${API_URL}/api/events`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch events");
@@ -50,7 +51,7 @@ type CreateEventResponse = {
 };
 
 export async function createEvent(payload: CreateEventPayload): Promise<Event> {
-  const response = await fetch("/api/events", {
+  const response = await fetch(`${API_URL}/api/events`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -75,7 +76,7 @@ export async function createEvent(payload: CreateEventPayload): Promise<Event> {
 }
 
 export async function getMyEvents(): Promise<Event[]> {
-  const response = await fetch("/api/events/my", {
+  const response = await fetch(`${API_URL}/api/events/my`, {
     credentials: "include",
   });
 
@@ -89,7 +90,7 @@ export async function getMyEvents(): Promise<Event[]> {
 }
 
 export async function getAttendingEvents(): Promise<Event[]> {
-  const response = await fetch("/api/events/my/attending", {
+  const response = await fetch(`${API_URL}/api/events/my/attending`, {
     credentials: "include",
   });
 
@@ -117,7 +118,7 @@ async function eventRegistrationRequest(
   method: "POST" | "DELETE",
 ): Promise<EventRegistrationResponse> {
   const response = await fetch(
-    `/api/events/${encodeURIComponent(eventId)}/register`,
+    `${API_URL}/api/events/${encodeURIComponent(eventId)}/register`,
     {
       method,
       credentials: "include",
@@ -149,7 +150,7 @@ export async function getEventRegistrationStatus(
   eventId: string,
 ): Promise<EventRegistrationStatusResponse> {
   const response = await fetch(
-    `/api/events/${encodeURIComponent(eventId)}/registration`,
+    `${API_URL}/api/events/${encodeURIComponent(eventId)}/registration`,
     {
       method: "GET",
       credentials: "include",
@@ -184,7 +185,7 @@ export async function getEventParticipants(
   eventId: string,
 ): Promise<EventParticipant[]> {
   const response = await fetch(
-    `/api/events/${encodeURIComponent(eventId)}/participants`,
+    `${API_URL}/api/events/${encodeURIComponent(eventId)}/participants`,
     {
       credentials: "include",
     },
@@ -202,7 +203,7 @@ export async function getEventParticipants(
 }
 
 export async function deleteEvent(eventId: string): Promise<void> {
-  const response = await fetch(`/api/events/${encodeURIComponent(eventId)}`, {
+  const response = await fetch(`${API_URL}/api/events/${encodeURIComponent(eventId)}`, {
     method: "DELETE",
     credentials: "include",
   });
