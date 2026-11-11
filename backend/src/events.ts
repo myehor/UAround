@@ -1,11 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { prisma } from "./lib/prisma.js";
+import { uploadEventImage } from "./lib/cloudinary.js";
 
 const router = Router();
 
@@ -503,6 +501,7 @@ router.post("/", async (req, res) => {
       return;
     }
 
+    
     let imageUrl = "/images/event-placeholder.png";
 
     if (data.imageData) {
@@ -517,7 +516,6 @@ router.post("/", async (req, res) => {
         return;
       }
 
-      const extension = match[1] === "jpeg" ? "jpg" : match[1];
       const imageBuffer = Buffer.from(match[2], "base64");
 
       if (imageBuffer.length === 0 || imageBuffer.length > 5 * 1024 * 1024) {
@@ -527,21 +525,9 @@ router.post("/", async (req, res) => {
         return;
       }
 
-      const uploadsDir = path.resolve(
-        path.dirname(fileURLToPath(import.meta.url)),
-        "..",
-        "uploads",
-        "events",
-      );
-
-      await mkdir(uploadsDir, { recursive: true });
-
-      const filename = `${randomUUID()}.${extension}`;
-
-      await writeFile(path.join(uploadsDir, filename), imageBuffer);
-
-      imageUrl = `/uploads/events/${filename}`;
+      imageUrl = await uploadEventImage(data.imageData);
     }
+
 
     const now = new Date().toISOString();
     const category =

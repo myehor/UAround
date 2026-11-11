@@ -1,6 +1,7 @@
 import { useState } from "react";
 import eventPlaceholder from "../../assets/images/event-placeholder.png";
 import type { ChangeEvent, FormEvent } from "react";
+import { bundeslaender, getCities } from "../../data/locations";
 
 import { createEvent } from "../../api/events";
 import type { EventCategory } from "../../types/event";
@@ -40,6 +41,8 @@ function CreateEventPage() {
   const [submitError, setSubmitError] = useState("");
   const [eventImage, setEventImage] = useState(eventPlaceholder);
   const [eventImageFile, setEventImageFile] = useState<File | null>(null);
+  const [selectedBundesland, setSelectedBundesland] = useState("Bayern");
+  const [selectedCity, setSelectedCity] = useState("Würzburg");
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -65,6 +68,7 @@ function CreateEventPage() {
     const startTime = String(formData.get("startTime") ?? "");
     const endTime = String(formData.get("endTime") ?? "");
     const city = String(formData.get("city") ?? "").trim();
+    const bundesland = String(formData.get("bundesland") ?? "").trim();
     const venue = String(formData.get("venue") ?? "").trim();
 
     if (!title || !description || !date || !startTime || !city || !venue) {
@@ -113,7 +117,7 @@ function CreateEventPage() {
         date,
         startTime,
         ...(endTime ? { endTime } : {}),
-        bundesland: "Bayern",
+        bundesland,
         city,
         venue,
       });
@@ -256,20 +260,55 @@ function CreateEventPage() {
 
               <label className="create-event-page__field">
                 <span>
-                  End time <small>(optional)</small>
+                  End time <b>*</b>
                 </span>
 
                 <input type="time" name="endTime" defaultValue="20:00" />
               </label>
             </div>
 
-            <label className="create-event-page__field">
-              <span>
-                Location <b>*</b>
-              </span>
+            <div className="create-event-page__two-columns">
+              <label className="create-event-page__field">
+                <span>
+                  Bundesland <b>*</b>
+                </span>
+                <select
+                  name="bundesland"
+                  value={selectedBundesland}
+                  onChange={(event) => {
+                    const bundesland = event.target.value;
+                    setSelectedBundesland(bundesland);
+                    const cities = getCities(bundesland);
+                    setSelectedCity(cities[0] ?? "");
+                  }}
+                  required
+                >
+                  {bundeslaender.map((bundesland) => (
+                    <option key={bundesland} value={bundesland}>
+                      {bundesland}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-              <input type="text" name="city" defaultValue="Würzburg" />
-            </label>
+              <label className="create-event-page__field">
+                <span>
+                  City <b>*</b>
+                </span>
+                <select
+                  name="city"
+                  value={selectedCity}
+                  onChange={(event) => setSelectedCity(event.target.value)}
+                  required
+                >
+                  {getCities(selectedBundesland).map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
             <label className="create-event-page__field">
               <span>
@@ -279,6 +318,7 @@ function CreateEventPage() {
               <input
                 type="text"
                 name="venue"
+                required
                 defaultValue="Sportplatz Sanderau, Sanderauer Str. 25, 97072 Würzburg"
               />
             </label>
