@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import session from "express-session";
@@ -40,6 +41,28 @@ const pool = new Pool({
 const PgSession = connectPgSimple(session);
 
 app.disable("x-powered-by");
+
+const allowedOrigins = [
+  "https://uaround.vercel.app",
+  "https://uaround-6imf5bpra-myehor.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        /^https:\/\/uaround-[a-z0-9-]+-myehor\.vercel\.app$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 if (isProduction) {
   app.set("trust proxy", 1);
