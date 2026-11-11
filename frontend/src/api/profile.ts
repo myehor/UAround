@@ -16,6 +16,8 @@ export type UserProfile = {
   updatedAt: string;
 };
 
+const API_BASE_URL = "https://uaround-api.onrender.com";
+
 type ProfileResponse = {
   message?: string;
   user?: UserProfile;
@@ -46,7 +48,7 @@ async function readProfileResponse(
 }
 
 export async function getProfile(): Promise<UserProfile> {
-  const response = await fetch("/api/profile", {
+  const response = await fetch(`${API_BASE_URL}/api/profile`, {
     credentials: "include",
   });
   const data = await readProfileResponse(response);
@@ -71,7 +73,7 @@ export type UpdateProfilePayload = {
 export async function updateProfile(
   payload: UpdateProfilePayload,
 ): Promise<UserProfile> {
-  const response = await fetch("/api/profile", {
+  const response = await fetch(`${API_BASE_URL}/api/profile`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -106,7 +108,7 @@ export async function uploadAvatar(file: File) {
     reader.readAsDataURL(file);
   });
 
-  const response = await fetch("/api/profile/avatar", {
+  const response = await fetch(`${API_BASE_URL}/api/profile/avatar`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
