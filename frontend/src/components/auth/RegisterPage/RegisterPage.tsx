@@ -38,7 +38,7 @@ function RegisterPage() {
         city: String(formData.get("city") ?? ""),
       });
 
-      window.location.assign("/");
+      window.location.assign("/home");
     } catch (err) {
       setError(
         err instanceof Error
