@@ -197,5 +197,10 @@
       grid-template-columns: 1fr;
       gap: 18px;
     }
+
+    &__field input,
+    &__field select {
+      font-size: 16px;
+    }
   }
 }
