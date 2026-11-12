@@ -1571,3 +1571,135 @@
     }
   }
 }
+
+
+/* Responsive profile navigation */
+@media (min-width: 801px) and (max-width: 1100px) {
+  .profile-page {
+    &__theme {
+      padding-right: 4px;
+      padding-left: 4px;
+    }
+
+    &__theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+      padding: 5px 4px;
+    }
+
+    &__theme-icon {
+      flex: 0 0 18px;
+      font-size: 18px;
+    }
+
+    &__theme-track {
+      flex: 0 0 58px;
+      width: 58px;
+      height: 30px;
+    }
+
+    &__theme-thumb {
+      width: 24px;
+      height: 24px;
+    }
+
+    &__theme-toggle--dark {
+      .profile-page__theme-thumb {
+        transform: translateX(28px);
+      }
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-page {
+    &__navigation {
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      overflow: visible;
+    }
+
+    &__nav-item {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 46px;
+      padding: 0;
+      border: 1px solid #e1eaf5;
+      border-radius: 12px;
+      background: #ffffff;
+      font-size: 0;
+
+      span {
+        width: auto;
+        font-size: 21px;
+      }
+
+      &--active {
+        background: #e3f1fa;
+        border-color: #c8e2f3;
+      }
+    }
+
+    &__theme {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 0;
+      margin: 0;
+      border: 0;
+    }
+
+    &__theme-label {
+      display: none;
+    }
+
+    &__theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 46px;
+      padding: 0;
+      border-radius: 12px;
+    }
+
+    &__theme-icon {
+      display: none;
+    }
+
+    &__theme-track {
+      flex: 0 0 48px;
+      width: 48px;
+      height: 26px;
+    }
+
+    &__theme-thumb {
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+    }
+
+    &__theme-toggle--dark {
+      .profile-page__theme-thumb {
+        transform: translateX(22px);
+      }
+    }
+
+    &__nav-item--logout {
+      margin-top: 0;
+      background: #fff0f1;
+      border-color: #f8d8dc;
+      color: #ed2929;
+    }
+  }
+}
