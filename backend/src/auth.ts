@@ -57,6 +57,7 @@ router.post("/register", async (req, res) => {
         emailVerified: true,
         bundesland: true,
         city: true,
+        avatarUrl: true,
         createdAt: true,
       },
     });
@@ -167,6 +168,7 @@ router.post("/login", async (req, res) => {
         emailVerified: user.emailVerified,
         bundesland: user.bundesland,
         city: user.city,
+        avatarUrl: user.avatarUrl,
         createdAt: user.createdAt,
       },
     });
@@ -193,6 +195,7 @@ router.get("/me", async (req, res) => {
         emailVerified: true,
         bundesland: true,
         city: true,
+        avatarUrl: true,
         createdAt: true,
       },
     });

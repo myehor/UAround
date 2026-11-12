@@ -6,6 +6,7 @@ export type AuthUser = {
   emailVerified: boolean;
   bundesland: string;
   city: string;
+  avatarUrl: string | null;
   createdAt: string;
 };
 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 import Container from "../Container/Container";
@@ -30,6 +31,16 @@ function Header() {
       console.error("Failed to log out:", error);
     }
   };
+
+  const renderAvatar = () => (
+    <span className="header__avatar">
+      {user?.avatarUrl ? (
+        <img src={user.avatarUrl} alt="" />
+      ) : (
+        <span aria-hidden="true">{avatarLetter}</span>
+      )}
+    </span>
+  );
 
   return (
     <header className="header">
@@ -93,9 +104,7 @@ function Header() {
                 href="/profile"
                 aria-label={`Open profile: ${displayName}`}
               >
-                <span className="header__avatar" aria-hidden="true">
-                  {avatarLetter}
-                </span>
+                {renderAvatar()}
                 <span className="header__profile-name">{displayName}</span>
                 <span className="header__account-chevron" aria-hidden="true">
                   ⌄
@@ -179,9 +188,7 @@ function Header() {
               onClick={closeMobileMenu}
               tabIndex={isMobileMenuOpen ? 0 : -1}
             >
-              <span className="header__avatar" aria-hidden="true">
-                {avatarLetter}
-              </span>
+              {renderAvatar()}
               My profile
             </a>
           )}
