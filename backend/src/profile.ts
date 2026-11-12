@@ -2,11 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 
 import { prisma } from "./lib/prisma.js";
-
-import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { uploadAvatarImage } from "./lib/cloudinary.js";
 
 const router = Router();
 
@@ -62,6 +58,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 router.post("/avatar", async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -91,7 +88,6 @@ router.post("/avatar", async (req, res) => {
       return;
     }
 
-    const extension = match[1] === "jpeg" ? "jpg" : match[1];
     const imageBuffer = Buffer.from(match[2], "base64");
 
     if (imageBuffer.length === 0 || imageBuffer.length > 5 * 1024 * 1024) {
@@ -99,23 +95,11 @@ router.post("/avatar", async (req, res) => {
       return;
     }
 
-    const uploadsDir = path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      "..",
-      "uploads",
-      "avatars",
-    );
-
-    await mkdir(uploadsDir, { recursive: true });
-
-    const filename = `${randomUUID()}.${extension}`;
-    const filePath = path.join(uploadsDir, filename);
-
-    await writeFile(filePath, imageBuffer);
+    const avatarUrl = await uploadAvatarImage(parsed.data.imageData);
 
     const user = await prisma.user.update({
       where: { id: userId },
-      data: { avatarUrl: `/uploads/avatars/${filename}` },
+      data: { avatarUrl },
       select: profileSelect,
     });
 
