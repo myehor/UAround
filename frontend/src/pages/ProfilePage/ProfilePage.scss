@@ -1639,48 +1639,60 @@
   }
 }
 
+
 @media (max-width: 560px) {
   .profile-page {
     &__navigation {
-      align-items: center;
+      display: flex;
+      align-items: stretch;
       justify-content: space-between;
       gap: 10px;
       overflow: visible;
+      padding: 10px;
     }
 
     &__nav-item {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      display: flex;
       flex: 1 1 0;
       min-width: 0;
-      min-height: 46px;
-      padding: 0;
+      min-height: 82px;
+      padding: 10px 4px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
       border: 1px solid #e1eaf5;
-      border-radius: 12px;
+      border-radius: 15px;
       background: #ffffff;
-      font-size: 0;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.2;
+      text-decoration: none;
 
       span {
         width: auto;
-        font-size: 21px;
+        font-size: 13px;
       }
 
       &--active {
-        background: #e3f1fa;
-        border-color: #c8e2f3;
+        background: #e8f4fc;
+        border-color: #c8e3f8;
+        color: #0874b9;
       }
     }
 
     &__theme {
       display: flex;
-      align-items: center;
-      justify-content: center;
       flex: 1 1 0;
       min-width: 0;
-      padding: 0;
+      min-height: 82px;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
       margin: 0;
-      border: 0;
+      border: 1px solid #e1eaf5;
+      border-radius: 15px;
+      background: #ffffff;
     }
 
     &__theme-label {
@@ -1689,42 +1701,46 @@
 
     &__theme-toggle {
       display: flex;
+      width: auto;
+      max-width: 100%;
       align-items: center;
       justify-content: center;
-      width: 100%;
-      height: 46px;
-      padding: 0;
-      border-radius: 12px;
+      gap: 5px;
+      padding: 8px 4px;
+      border: 0;
+      background: transparent;
     }
 
     &__theme-icon {
-      display: none;
+      display: block;
+      font-size: 17px;
+      line-height: 1;
     }
 
     &__theme-track {
-      flex: 0 0 48px;
-      width: 48px;
-      height: 26px;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 25px;
     }
 
     &__theme-thumb {
       top: 3px;
       left: 3px;
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
     }
 
     &__theme-toggle--dark {
       .profile-page__theme-thumb {
-        transform: translateX(22px);
+        transform: translateX(17px);
       }
     }
 
     &__nav-item--logout {
       margin-top: 0;
-      background: #fff0f1;
-      border-color: #f8d8dc;
-      color: #ed2929;
+      background: #fff1f2;
+      border-color: #f8dadd;
+      color: #e53945;
     }
   }
 }

@@ -478,30 +478,14 @@ function ProfilePage() {
             <a
               href="/profile"
               className="profile-page__nav-item profile-page__nav-item--active"
-              aria-label="Profile"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <circle
-                  cx="12"
-                  cy="7"
-                  r="4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-              </svg>
-              <span>Profile</span>
+              <span aria-hidden="true">♙</span>
+              Profile
             </a>
 
             <div className="profile-page__theme">
               <div className="profile-page__theme-label">
+                <span aria-hidden="true">☾</span>
                 Theme
               </div>
 
@@ -532,21 +516,12 @@ function ProfilePage() {
               type="button"
               className="profile-page__nav-item profile-page__nav-item--logout"
               onClick={handleLogout}
-              aria-label="Log out"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M10 17l5-5-5-5M15 12H3m9-8h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-7"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span>Log out</span>
+              <span aria-hidden="true">⇥</span>
+              Log out
             </button>
           </nav>
+
         </aside>
 
         <div className="profile-page__content">
